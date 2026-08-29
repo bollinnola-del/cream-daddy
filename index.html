@@ -1,0 +1,1854 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#111111">
+    <title>Cream Daddy Sales</title>
+    <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Cream%20Daddy%20Sales%22%2C%22short_name%22%3A%22CreamDaddy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23111111%22%2C%22theme_color%22%3A%22%23111111%22%7D">
+    <style>
+        :root {
+            --brand-pink: #e83393;
+            --brand-gold: #fabc15;
+            --brand-black: #111111;
+            --brand-white: #ffffff;
+            --bg-body: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --danger: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            padding-bottom: 90px;
+        }
+
+        header {
+            background-color: var(--brand-black);
+            color: var(--brand-white);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-logo-img {
+            height: 38px;
+            max-width: 140px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #fff;
+            padding: 2px 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-header-sync {
+            background-color: var(--brand-pink);
+            color: var(--brand-white);
+            border: 2px solid var(--brand-gold);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .shift-bar {
+            background-color: var(--brand-gold);
+            color: var(--brand-black);
+            padding: 8px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .shift-bar button {
+            background: var(--brand-black);
+            color: var(--brand-white);
+            border: none;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--brand-white);
+            border-top: 2px solid var(--border-color);
+            display: flex;
+            height: 65px;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            gap: 3px;
+        }
+
+        .nav-item.active {
+            color: var(--brand-pink);
+            border-top: 4px solid var(--brand-pink);
+        }
+
+        .nav-icon {
+            font-size: 18px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 14px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid-flavors {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+            .flavor-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            height: 52px;
+            min-height: 52px;
+
+            display: grid;
+            grid-template-columns: 34px 1fr auto auto;
+
+            align-items: center;
+            gap: 8px;
+
+            padding: 4px 10px;
+            text-align: left;
+
+            cursor: pointer;
+        }
+
+        .flavor-card:active {
+            transform: scale(0.97);
+            border-color: var(--brand-pink);
+        }
+
+        .flavor-card.out-of-stock {
+            opacity: 0.55;
+            border-color: #d1d5db;
+        }
+
+        .flavor-img-wrapper {
+        width: 32px;
+        height: 32px;
+        margin: 0;
+         }
+
+        .flavor-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .flavor-fallback-icon {
+            font-size: 32px;
+        }
+
+        .flavor-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--brand-black);
+            margin-bottom: 2px;
+        }
+
+        .flavor-price {
+            font-weight: 800;
+            color: var(--brand-pink);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .flavor-stock-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #e5e7eb;
+            color: var(--text-dark);
+        }
+
+        .flavor-stock-tag.low {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .cart-section {
+            background: var(--brand-white);
+            border: 2px solid var(--brand-black);
+            border-radius: 14px;
+            padding: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .cart-title {
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--brand-black);
+        }
+
+        .btn-clear-cart {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .cart-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 220px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .cart-item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9fafb;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .item-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--brand-gold);
+        }
+
+        .item-details-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--brand-black);
+        }
+
+        .item-details-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-comp-toggle {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            background: #ffffff;
+            color: var(--text-dark);
+        }
+
+        .btn-comp-toggle.is-free {
+            background: var(--brand-gold);
+            color: var(--brand-black);
+            border-color: #d97706;
+        }
+
+        .qty-stepper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 2px 4px;
+        }
+
+        .qty-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 800;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand-pink);
+            cursor: pointer;
+        }
+
+        .qty-num {
+            font-size: 13px;
+            font-weight: 800;
+            min-width: 14px;
+            text-align: center;
+        }
+
+        .cart-summary {
+            border-top: 2px dashed var(--border-color);
+            padding-top: 10px;
+            margin-bottom: 12px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+        }
+
+        .summary-row.total-row {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--brand-black);
+            margin-top: 6px;
+            padding-top: 4px;
+        }
+
+        .summary-row.total-row span:last-child {
+            color: var(--brand-pink);
+        }
+
+        .btn-checkout {
+            width: 100%;
+            background: var(--brand-pink);
+            color: var(--brand-white);
+            border: 2px solid var(--brand-black);
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--brand-black);
+            transition: transform 0.05s ease;
+        }
+
+        .btn-checkout:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--brand-black);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .card-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--brand-black);
+        }
+
+        .btn-primary {
+            background: var(--brand-pink);
+            color: var(--brand-white);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-gold {
+            background: var(--brand-gold);
+            color: var(--brand-black);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn-danger-outline {
+            background: none;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn-edit-outline {
+            background: none;
+            border: 1px solid var(--brand-pink);
+            color: var(--brand-pink);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            margin-right: 4px;
+        }
+
+        .inv-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .inv-table th {
+            text-align: left;
+            padding: 8px;
+            background: #f3f4f6;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .inv-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .inv-flavor-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+        }
+
+        .inv-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            object-fit: cover;
+            border: 1px solid var(--brand-gold);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--brand-pink);
+            margin-top: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--brand-white);
+            border-radius: 14px;
+            max-width: 480px;
+            width: 100%;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--brand-black);
+            margin-bottom: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .photo-picker-box {
+            border: 2px dashed var(--brand-pink);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            background: #fdf2f8;
+            margin-bottom: 12px;
+        }
+
+        .photo-btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            justify-content: center;
+        }
+
+        .photo-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin: 8px auto;
+            display: none;
+            border: 2px solid var(--brand-gold);
+        }
+
+        .btn-modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 16px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        #qr-canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 14px;
+            background: #f9fafb;
+            border-radius: 12px;
+            margin: 14px 0;
+        }
+
+        #qr-canvas-container canvas {
+            max-width: 200px;
+            max-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="https://davita-production-be.glean.com/api/v1/downloadchatfile/4659584f359c48b1ac757568b33b6401" alt="Cream Daddy Logo" class="brand-logo-img" onerror="this.outerHTML='<h2 style=\'color:var(--brand-pink);\'>🍦 CREAM DADDY</h2>'">
+        </div>
+        <div class="header-actions">
+            <button class="btn-header-sync" onclick="openModal('sync-modal')">☁️ Cloud Sync</button>
+        </div>
+    </header>
+
+    <div class="shift-bar">
+        <div>
+            <span id="display-venue">📍 Set Today's Venue</span> • <span id="display-date">Today</span>
+        </div>
+        <button onclick="openModal('venue-modal')">Change</button>
+    </div>
+
+    <div id="tab-register" class="tab-content active">
+        <div class="cart-section">
+            <div class="cart-header">
+                <div class="cart-title">🛒 Current Order</div>
+                <button class="btn-clear-cart" onclick="clearCart()">Clear Cart</button>
+            </div>
+            <div id="cart-list" class="cart-items-list"></div>
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Paid Units Sold</span>
+                    <span id="cart-paid-units">0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Free / Comps</span>
+                    <span id="cart-comp-units">0</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span>Order Total</span>
+                    <span id="cart-total-price">$0.00</span>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+
+                <button class="btn-checkout"
+                        onclick="completeSale('cash')">
+                    💵 Cash
+                </button>
+
+                <button class="btn-checkout"
+                        style="background:#fabc15;color:#111;"
+                        onclick="startVenmoTransaction()">
+                    💳 Card
+                </button>
+
+            </div>
+        </div>
+
+        <div class="card-header-row">
+            <div class="card-title">Select Flavor</div>
+            <button class="btn-primary" onclick="openModal('flavor-modal')">+ Add Flavor</button>
+        </div>
+        <div id="register-flavors-grid" class="grid-flavors"></div>
+    </div>
+
+    <div id="tab-inventory" class="tab-content">
+        <div class="card">
+            <div class="card-header-row">
+                <div class="card-title">Pint Inventory & Menu</div>
+                <button class="btn-primary" onclick="openModal('flavor-modal')">+ Add Flavor</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="inv-table">
+                    <thead>
+                        <tr>
+                            <th>Flavor</th>
+                            <th>Price</th>
+                            <th>Start</th>
+                            <th>Sold</th>
+                            <th>Free</th>
+                            <th>Left</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header-row">
+                <div class="card-title">Restock Cooler</div>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Quickly update starting pack counts for today's venue shift.</p>
+            <div id="quick-restock-list"></div>
+            <button class="btn-gold" style="width: 100%; margin-top: 10px;" onclick="saveRestockCounts()">Save Cooler Counts</button>
+        </div>
+    </div>
+
+    <div id="tab-stats" class="tab-content">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-val" id="stat-revenue">$0.00</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pints Sold</div>
+                <div class="stat-val" id="stat-sold">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pints Free/Comp</div>
+                <div class="stat-val" id="stat-comp">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Transactions</div>
+                <div class="stat-val" id="stat-txs">0</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title" style="margin-bottom: 10px;">📄 Export Shift Data</div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-primary" style="flex:1;" onclick="copyGoogleDocSummary()">📋 Copy for Google Docs</button>
+                <button class="btn-gold" style="flex:1;" onclick="exportCSV()">📊 Export CSV (Sheets)</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title" style="margin-bottom: 10px;">📜 Shift Receipt Log</div>
+            <div id="transactions-history-list"></div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('tab-register', this)">
+            <span class="nav-icon">🛒</span>
+            <span>Register</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-inventory', this)">
+            <span class="nav-icon">📦</span>
+            <span>Inventory</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('tab-stats', this)">
+            <span class="nav-icon">📊</span>
+            <span>Stats & Export</span>
+        </button>
+    </nav>
+
+    <!-- ADD FLAVOR MODAL -->
+    <div id="flavor-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-modal-close" onclick="closeModal('flavor-modal')">&times;</button>
+            <div class="modal-title">Add Flavor / Product</div>
+            <div class="photo-picker-box">
+                <div class="form-label">📸 Take Photo or Upload Image</div>
+                <div class="photo-btn-group">
+                    <button class="btn-primary" type="button" onclick="document.getElementById('flavor-camera-input').click()">📷 Take Photo</button>
+                    <button class="btn-secondary" type="button" onclick="document.getElementById('flavor-gallery-input').click()">🖼️ Upload File</button>
+                </div>
+                <input type="file" id="flavor-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event, 'flavor-photo-preview')">
+                <input type="file" id="flavor-gallery-input" accept="image/*" style="display:none;" onchange="handleImageUpload(event, 'flavor-photo-preview')">
+                <img id="flavor-photo-preview" class="photo-preview" alt="Preview">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Flavor Name</label>
+                <input type="text" id="new-flavor-name" class="form-input" placeholder="e.g. Vanilla Bean Brownie">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Price per Container ($)</label>
+                <input type="number" id="new-flavor-price" class="form-input" step="0.50" value="8.00">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Starting Cooler Stock</label>
+                <input type="number" id="new-flavor-stock" class="form-input" value="12">
+            </div>
+            <button class="btn-primary" style="width: 100%; padding: 12px;" onclick="saveNewFlavor()">Save to Menu</button>
+        </div>
+    </div>
+
+    <!-- EDIT FLAVOR MODAL -->
+    <div id="edit-flavor-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-modal-close" onclick="closeModal('edit-flavor-modal')">&times;</button>
+            <div class="modal-title">Edit Flavor</div>
+            <input type="hidden" id="edit-flavor-id">
+            <div class="photo-picker-box">
+                <div class="form-label">📸 Update Flavor Photo</div>
+                <div class="photo-btn-group">
+                    <button class="btn-primary" type="button" onclick="document.getElementById('edit-camera-input').click()">📷 Take Photo</button>
+                    <button class="btn-secondary" type="button" onclick="document.getElementById('edit-gallery-input').click()">🖼️ Upload File</button>
+                </div>
+                <input type="file" id="edit-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event, 'edit-photo-preview')">
+                <input type="file" id="edit-gallery-input" accept="image/*" style="display:none;" onchange="handleImageUpload(event, 'edit-photo-preview')">
+                <img id="edit-photo-preview" class="photo-preview" alt="Preview">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Flavor Name</label>
+                <input type="text" id="edit-flavor-name" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Price per Container ($)</label>
+                <input type="number" id="edit-flavor-price" class="form-input" step="0.50">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Starting Cooler Stock</label>
+                <input type="number" id="edit-flavor-stock" class="form-input">
+            </div>
+            <button class="btn-primary" style="width: 100%; padding: 12px;" onclick="saveEditedFlavor()">Save Changes</button>
+        </div>
+    </div>
+
+    <div id="venue-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-modal-close" onclick="closeModal('venue-modal')">&times;</button>
+            <div class="modal-title">Select Today's Venue</div>
+            <div class="form-group">
+                <label class="form-label">Venue / Pop-up Location</label>
+                <input type="text" id="venue-input" class="form-input" placeholder="e.g. Cherry Creek Farmers Market">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" id="venue-date" class="form-input">
+            </div>
+            <button class="btn-primary" style="width: 100%; margin-bottom: 16px;" onclick="saveVenue()">Set Active Venue</button>
+            <div class="card-title" style="font-size: 14px; margin-bottom: 8px;">Saved Venues</div>
+            <div id="saved-venues-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+    </div>
+
+    <div id="sync-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="btn-modal-close" onclick="closeModal('sync-modal')">&times;</button>
+            <div class="modal-title">☁️ Team & Cloud Sync</div>
+            
+            <p style="font-size: 13px; font-weight:700; color: var(--brand-black); margin-bottom: 4px;">1. Live Google Sheets Integration</p>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Connected to your Google Sheet master record. Menu items, photos, and sales sync in real time.</p>
+            <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+                <button class="btn-primary" style="flex:1;" onclick="fetchFromGoogleSheet(true)">🔄 Pull from Sheet</button>
+                <button class="btn-secondary" style="flex:1;" onclick="pushMenuToGoogleSheet(true)">⬆️ Push Menu</button>
+                <button class="btn-gold" onclick="testScriptSync()">🧪 Ping</button>
+            </div>
+
+            <hr style="margin: 14px 0; border: none; border-top: 1px solid var(--border-color);">
+
+            <p style="font-size: 13px; font-weight:700; color: var(--brand-black); margin-bottom: 4px;">2. Scan to Join Shift (Helper QR)</p>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Scan with any second phone to instantly load current shift inventory.</p>
+            <div id="qr-canvas-container">
+                <canvas id="qr-canvas"></canvas>
+                <span id="qr-room-label" style="font-size: 12px; font-weight: 800; margin-top: 8px; color: var(--brand-pink);"></span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-gold" style="width: 100%;" onclick="copyJoinLink()">📋 Copy Join Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+    <script>
+        const HARDCODED_WEBHOOK = "https://script.google.com/macros/s/AKfycbyivvuwjWAkyGO6E7ooPaovbHXDnYvKXrQF0nflaB4eYD7SG3MdvdxcJJYDj0BWsfc7Ig/exec";
+
+        const STATE = {
+            venue: "Daily Pop-Up",
+            date: new Date().toISOString().split('T')[0],
+            savedVenues: [],
+            flavors: [],
+            cart: [],
+            transactions: [],
+            syncRoom: "CREAM-DADDY-" + Math.floor(100 + Math.random() * 900),
+            scriptUrl: HARDCODED_WEBHOOK,
+            tempPhotoBase64: "",
+            isSyncing: false
+        };function haptic(type = 'light') {
+
+    if (!navigator.vibrate) return;
+
+    switch(type) {
+
+        case 'light':
+            navigator.vibrate(15);
+            break;
+
+        case 'medium':
+            navigator.vibrate(40);
+            break;
+
+        case 'success':
+            navigator.vibrate([40,30,80]);
+            break;
+
+        case 'error':
+            navigator.vibrate([100,50,100]);
+            break;
+    }
+}
+
+        function loadSavedState() {
+            try {
+                const saved = localStorage.getItem('cream_daddy_pos_data');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.flavors) STATE.flavors = parsed.flavors;
+                    if (parsed.venue) STATE.venue = parsed.venue;
+                    if (parsed.date) STATE.date = parsed.date;
+                    if (parsed.savedVenues) STATE.savedVenues = parsed.savedVenues;
+                    if (parsed.transactions) STATE.transactions = parsed.transactions;
+                    if (parsed.syncRoom) STATE.syncRoom = parsed.syncRoom;
+                }
+            } catch(e) {}
+        }
+
+        function persistState() {
+            try {
+                localStorage.setItem('cream_daddy_pos_data', JSON.stringify({
+                    flavors: STATE.flavors,
+                    venue: STATE.venue,
+                    date: STATE.date,
+                    savedVenues: STATE.savedVenues,
+                    transactions: STATE.transactions,
+                    syncRoom: STATE.syncRoom
+                }));
+            } catch(e) {}
+        }
+
+        // Robust cross-origin communication with Google Apps Script using JSONP
+        window.handleGoogleSheetSyncResponse = function(data) {
+            if (data && data.status === 'success') {
+                if (Array.isArray(data.flavors)) {
+                    const localPhotoMap = new Map((STATE.flavors || []).map(f => [f.name.toLowerCase().trim(), f.photo]));
+                    STATE.flavors = data.flavors.map(f => ({
+                        ...f,
+                        currentStock: Number(f.currentStock != null ? f.currentStock : f.startingStock) || 0,
+                        startingStock: Number(f.currentStock != null ? f.currentStock : f.startingStock) || 0,
+                        photo: f.photo || localPhotoMap.get((f.name || "").toLowerCase().trim()) || ""
+                    }));
+                }
+                if (Array.isArray(data.transactions)) {
+                    STATE.transactions = data.transactions;
+                }
+                persistState();
+                renderAll();
+                updateSyncHeaderStatus('☁️ Live Cloud');
+                if (window._isUserSyncManual) {
+                    alert('✅ Pulled latest menu, inventory, and sales log from Google Sheet!');
+                    window._isUserSyncManual = false;
+                }
+            }
+            STATE.isSyncing = false;
+        };
+
+        function fetchFromGoogleSheet(isManual = false) {
+            if (STATE.isSyncing) return;
+            STATE.isSyncing = true;
+            window._isUserSyncManual = isManual;
+            updateSyncHeaderStatus('☁️ Syncing...');
+
+            const oldScript = document.getElementById('jsonp-sync-script');
+            if (oldScript) oldScript.remove();
+
+            const script = document.createElement('script');
+            script.id = 'jsonp-sync-script';
+            script.src = STATE.scriptUrl + '?action=pull_all&callback=handleGoogleSheetSyncResponse&t=' + Date.now();
+            script.onerror = function() {
+                console.warn('JSONP network notice (retaining local offline state)');
+                STATE.isSyncing = false;
+                updateSyncHeaderStatus('☁️ Local Ready');
+            };
+            document.body.appendChild(script);
+        }
+
+        async function sendSheetPayload(payloadObj) {
+            const body = JSON.stringify(payloadObj);
+            try {
+                updateSyncHeaderStatus('☁️ Saving...');
+                await fetch(STATE.scriptUrl, {
+                    method: 'POST', mode: 'no-cors', cache: 'no-store',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body
+                });
+                updateSyncHeaderStatus('☁️ Saved');
+                setTimeout(() => fetchFromGoogleSheet(false), 1200);
+                return true;
+            } catch (err) {
+                console.warn('Sheet write failed; retained locally for retry:', err);
+                const pending = JSON.parse(localStorage.getItem('cream_daddy_pending_writes') || '[]');
+                pending.push(payloadObj);
+                localStorage.setItem('cream_daddy_pending_writes', JSON.stringify(pending));
+                updateSyncHeaderStatus('⚠️ Offline');
+                return false;
+            }
+        }
+        async function flushPendingWrites() {
+            const pending = JSON.parse(localStorage.getItem('cream_daddy_pending_writes') || '[]');
+            if (!pending.length || !navigator.onLine) return;
+            localStorage.removeItem('cream_daddy_pending_writes');
+            for (const payload of pending) await sendSheetPayload(payload);
+        }
+        window.addEventListener('online', flushPendingWrites);
+
+        function pushMenuToGoogleSheet(isUserTriggered = false) {
+            const payload = {
+                action: "update_menu",
+                flavors: STATE.flavors.map(f => ({
+                    id: f.id,
+                    name: f.name,
+                    price: f.price,
+                    currentStock: Number(f.currentStock != null ? f.currentStock : f.startingStock) || 0,
+                    startingStock: Number(f.currentStock != null ? f.currentStock : f.startingStock) || 0,
+                    photo: f.photo || ""
+                }))
+            };
+            sendSheetPayload(payload);
+            if (isUserTriggered) alert('⬆️ Pushed menu and inventory to Google Sheet!');
+        }
+
+        function updateSyncHeaderStatus(text) {
+            const btn = document.querySelector('.btn-header-sync');
+            if (btn) btn.textContent = text;
+        }
+
+        window.switchTab = function(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+            if (el) el.classList.add('active');
+            renderStats();
+            renderInventoryTable();
+        };
+
+        window.openModal = function(id) {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.add('active');
+                if (id === 'venue-modal') {
+                    document.getElementById('venue-input').value = STATE.venue;
+                    document.getElementById('venue-date').value = STATE.date;
+                    renderSavedVenues();
+                }
+                if (id === 'sync-modal') {
+                    generateQR();
+                }
+            }
+        };
+
+        window.closeModal = function(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('active');
+        };
+
+        window.handleImageUpload = function(e, previewId) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 140; // optimized for Google Sheet cell limits
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    STATE.tempPhotoBase64 = canvas.toDataURL('image/jpeg', 0.80);
+                    const preview = document.getElementById(previewId);
+                    if (preview) {
+                        preview.src = STATE.tempPhotoBase64;
+                        preview.style.display = 'block';
+                    }
+                };
+                img.src = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.saveNewFlavor = function() {
+            const nameInput = document.getElementById('new-flavor-name');
+            const priceInput = document.getElementById('new-flavor-price');
+            const stockInput = document.getElementById('new-flavor-stock');
+
+            const name = nameInput.value.trim();
+            const price = parseFloat(priceInput.value) || 0;
+            const stock = parseInt(stockInput.value) || 0;
+
+            if (!name) {
+                alert('Please enter a flavor name.');
+                return;
+            }
+
+            const newFlavor = {
+                id: 'flv_' + Date.now(),
+                name: name,
+                price: price,
+                startingStock: stock,
+                currentStock: stock,
+                photo: STATE.tempPhotoBase64 || ""
+            };
+
+            STATE.flavors.push(newFlavor);
+            persistState();
+            pushMenuToGoogleSheet(false);
+
+            nameInput.value = '';
+            priceInput.value = '8.00';
+            stockInput.value = '12';
+            STATE.tempPhotoBase64 = '';
+            const preview = document.getElementById('flavor-photo-preview');
+            if (preview) preview.style.display = 'none';
+
+            closeModal('flavor-modal');
+            renderAll();
+        };
+
+        window.openEditFlavor = function(id) {
+            const flavor = STATE.flavors.find(f => f.id === id);
+            if (!flavor) return;
+
+            document.getElementById('edit-flavor-id').value = flavor.id;
+            document.getElementById('edit-flavor-name').value = flavor.name;
+            document.getElementById('edit-flavor-price').value = flavor.price;
+            document.getElementById('edit-flavor-stock').value = flavor.startingStock;
+            STATE.tempPhotoBase64 = flavor.photo || "";
+
+            const preview = document.getElementById('edit-photo-preview');
+            if (flavor.photo) {
+                preview.src = flavor.photo;
+                preview.style.display = 'block';
+            } else {
+                preview.style.display = 'none';
+            }
+
+            openModal('edit-flavor-modal');
+        };
+
+        window.saveEditedFlavor = function() {
+            const id = document.getElementById('edit-flavor-id').value;
+            const flavor = STATE.flavors.find(f => f.id === id);
+            if (!flavor) return;
+
+            const name = document.getElementById('edit-flavor-name').value.trim();
+            const price = parseFloat(document.getElementById('edit-flavor-price').value) || 0;
+            const stock = parseInt(document.getElementById('edit-flavor-stock').value) || 0;
+
+            if (!name) {
+                alert('Please enter a flavor name.');
+                return;
+            }
+
+            flavor.name = name;
+            flavor.price = price;
+            flavor.startingStock = stock;
+            flavor.currentStock = stock;
+            if (STATE.tempPhotoBase64) flavor.photo = STATE.tempPhotoBase64;
+
+            persistState();
+            pushMenuToGoogleSheet(false);
+            closeModal('edit-flavor-modal');
+            renderAll();
+        };
+
+        window.deleteFlavor = function(id) {
+            if (confirm("Delete this flavor from the inventory and menu?")) {
+                STATE.flavors = STATE.flavors.filter(f => f.id !== id);
+                STATE.cart = STATE.cart.filter(c => c.flavorId !== id);
+                persistState();
+                pushMenuToGoogleSheet(false);
+                renderAll();
+            }
+        };
+
+        window.saveVenue = function() {
+            const venue = document.getElementById('venue-input').value.trim() || "Daily Pop-Up";
+            const date = document.getElementById('venue-date').value || new Date().toISOString().split('T')[0];
+
+            STATE.venue = venue;
+            STATE.date = date;
+
+            if (!STATE.savedVenues.includes(venue)) {
+                STATE.savedVenues.push(venue);
+            }
+
+            persistState();
+            closeModal('venue-modal');
+            renderShiftBar();
+        };
+
+        window.selectSavedVenue = function(v) {
+            STATE.venue = v;
+            persistState();
+            closeModal('venue-modal');
+            renderShiftBar();
+        };
+
+        window.deleteSavedVenue = function(v) {
+            STATE.savedVenues = STATE.savedVenues.filter(item => item !== v);
+            persistState();
+            renderSavedVenues();
+        };
+
+        function renderSavedVenues() {
+            const container = document.getElementById('saved-venues-list');
+            if (!container) return;
+            if (STATE.savedVenues.length === 0) {
+                container.innerHTML = '<span style="font-size:12px; color:var(--text-muted);">No saved presets.</span>';
+                return;
+            }
+            container.innerHTML = STATE.savedVenues.map(v => `
+                <div style="display:flex; justify-content:space-between; align-items:center; background:#f3f4f6; padding:6px 10px; border-radius:6px; font-size:13px;">
+                    <span style="font-weight:700; cursor:pointer;" onclick="selectSavedVenue('${v}')">📍 ${v}</span>
+                    <button class="btn-danger-outline" onclick="deleteSavedVenue('${v}')">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function getFlavorCounts(flavorId) {
+            let sold = 0;
+            let comp = 0;
+            STATE.transactions.forEach(t => {
+                (t.items || []).forEach(it => {
+                    if (it.flavorId === flavorId || (it.name && it.name.toLowerCase() === (STATE.flavors.find(f => f.id === flavorId)?.name || "").toLowerCase())) {
+                        if (it.isComp) comp += it.qty;
+                        else sold += it.qty;
+                    }
+                });
+            });
+            return { sold, comp };
+        }
+
+        function getFlavorStockRemaining(flavor) {
+            let staged = 0;
+            STATE.cart.forEach(it => { if (it.flavorId === flavor.id) staged += it.qty; });
+            const sheetStock = Number(flavor.currentStock != null ? flavor.currentStock : flavor.startingStock) || 0;
+            return Math.max(0, sheetStock - staged);
+        }
+
+        window.addToCart = function(flavorId) {
+            haptic('light');
+            const flavor = STATE.flavors.find(f => f.id === flavorId);
+            if (!flavor) return;
+
+            const remaining = getFlavorStockRemaining(flavor);
+            if (remaining <= 0) {
+                alert('No remaining stock left in cooler!');
+                return;
+            }
+
+            const existing = STATE.cart.find(c => c.flavorId === flavorId && !c.isComp);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                STATE.cart.push({
+                    flavorId: flavor.id,
+                    name: flavor.name,
+                    price: flavor.price,
+                    qty: 1,
+                    isComp: false,
+                    photo: flavor.photo || ""
+                });
+            }
+            renderRegister();
+        };
+
+        window.changeCartQty = function(index, delta) {
+            haptic('light');
+            const item = STATE.cart[index];
+            if (!item) return;
+            item.qty += delta;
+            if (item.qty <= 0) {
+                STATE.cart.splice(index, 1);
+            }
+            renderRegister();
+        };
+
+        window.toggleCartComp = function(index) {
+            haptic('medium');
+            const item = STATE.cart[index];
+            if (!item) return;
+            item.isComp = !item.isComp;
+            renderRegister();
+        };
+
+        window.clearCart = function() {
+            STATE.cart = [];
+            renderRegister();
+        };
+        window.startVenmoTransaction = function() {
+
+            if (STATE.cart.length === 0) {
+
+                haptic('error');
+
+                alert('Cart is empty.');
+
+                return;
+            }
+
+            const total = STATE.cart.reduce((sum, item) => {
+
+                return sum + (
+                    item.isComp
+                        ? 0
+                        : item.qty * item.price
+                );
+
+            }, 0);
+
+            const venmoUser = "creamdaddynola";
+
+            const note =
+                `Cream Daddy ${STATE.venue} ${STATE.date}`;
+
+            const venmoUrl =
+                `venmo://paycharge?txn=pay` +
+                `&recipients=${venmoUser}` +
+                `&amount=${total.toFixed(2)}` +
+                `&note=${encodeURIComponent(note)}`;
+
+            haptic('medium');
+
+            window.location.href = venmoUrl;
+
+            if (
+                confirm(
+                    "Did the Venmo payment complete successfully?"
+                )
+            ) {
+                completeSale('card');
+            }
+        };
+        window.completeSale = function(paymentMethod='cash') {
+            
+            if (STATE.cart.length === 0) {
+                haptic('error');
+
+                alert('Cart is empty. Tap flavors to add items to the order.');
+                return;
+            }
+
+            let totalUnitsSold = 0;
+            let totalUnitsGiven = 0;
+            let totalPrice = 0;
+
+            const orderItems = STATE.cart.map(it => {
+                if (it.isComp) {
+                    totalUnitsGiven += it.qty;
+                } else {
+                    totalUnitsSold += it.qty;
+                    totalPrice += (it.qty * it.price);
+                }
+                return { ...it };
+            });
+
+            const tx = {
+
+            id: 'tx_' + Date.now(),
+
+            timestamp: new Date().toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            }),
+
+            date: STATE.date,
+
+            venue: STATE.venue,
+
+            paymentMethod: paymentMethod,
+
+            items: orderItems,
+
+            totalPrice: totalPrice,
+
+            totalUnitsSold: totalUnitsSold,
+
+            totalUnitsGiven: totalUnitsGiven
+
+            };
+
+            STATE.transactions.unshift(tx);
+            orderItems.forEach(it => {
+                const flavor = STATE.flavors.find(f => f.id === it.flavorId);
+                if (flavor) {
+                    const current = Number(flavor.currentStock != null ? flavor.currentStock : flavor.startingStock) || 0;
+                    flavor.currentStock = Math.max(0, current - it.qty);
+                    flavor.startingStock = flavor.currentStock;
+                }
+            });
+            STATE.cart = [];
+            persistState();
+            renderAll();
+
+            // Send transaction directly to Google Sheet
+            sendSheetPayload({
+                venue: STATE.venue,
+                date: STATE.date,
+                transactions: [tx]
+            });
+            haptic('success');
+            
+            alert('✅ Order completed!');
+        };
+
+        function renderShiftBar() {
+            document.getElementById('display-venue').textContent = `📍 ${STATE.venue}`;
+            document.getElementById('display-date').textContent = STATE.date;
+        }
+
+        function renderRegister() {
+            renderShiftBar();
+
+            const grid = document.getElementById('register-flavors-grid');
+            if (!grid) return;
+
+            if (STATE.flavors.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: span 2;">
+                        <div class="empty-state-icon">🍦</div>
+                        <div style="font-weight:700; margin-bottom:6px;">Your menu is empty</div>
+                        <p style="font-size:12px; margin-bottom:12px;">Tap below to add your first flavor with a photo and starting cooler stock.</p>
+                        <button class="btn-primary" onclick="openModal('flavor-modal')">+ Add Flavor</button>
+                    </div>
+                `;
+            } else {
+                grid.innerHTML = STATE.flavors.map(f => {
+                    const remaining = getFlavorStockRemaining(f);
+                    const isOut = remaining <= 0;
+                    return `
+                        <div class="flavor-card ${isOut ? 'out-of-stock' : ''}" onclick="addToCart('${f.id}')">
+                            <div class="flavor-img-wrapper">
+                                ${f.photo ? `<img src="${f.photo}" alt="${f.name}">` : `<span class="flavor-fallback-icon">🍦</span>`}
+                            </div>
+                            <div class="flavor-name">${f.name}</div>
+                            <div class="flavor-price">$${f.price.toFixed(2)}</div>
+                            <div class="flavor-stock-tag ${remaining <= 3 ? 'low' : ''}">${remaining} Left</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const cartList = document.getElementById('cart-list');
+            if (!cartList) return;
+
+            if (STATE.cart.length === 0) {
+            
+                cartList.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:13px;">Tap a flavor card below to start an order.</div>';
+            } else {
+                cartList.innerHTML = STATE.cart.map((it, idx) => `
+                    <div class="cart-item-row">
+                        <div class="item-info">
+                            ${it.photo ? `<img src="${it.photo}" class="item-thumb" alt="${it.name}">` : `<span style="font-size:18px;">🍦</span>`}
+                            <div>
+                                <div class="item-details-name">${it.name}</div>
+                                <div class="item-details-sub">${it.isComp ? '<strong style="color:var(--brand-gold);">FREE / COMP</strong>' : `$${it.price.toFixed(2)} each`}</div>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn-comp-toggle ${it.isComp ? 'is-free' : ''}" onclick="toggleCartComp(${idx})">
+                                ${it.isComp ? '🎁 Free' : '$ Paid'}
+                            </button>
+                            <div class="qty-stepper">
+                                <button class="qty-btn" onclick="changeCartQty(${idx}, -1)">-</button>
+                                <span class="qty-num">${it.qty}</span>
+                                <button class="qty-btn" onclick="changeCartQty(${idx}, 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            let paidUnits = 0;
+            let compUnits = 0;
+            let totalDollars = 0;
+
+            STATE.cart.forEach(it => {
+                if (it.isComp) compUnits += it.qty;
+                else {
+                    paidUnits += it.qty;
+                    totalDollars += (it.qty * it.price);
+                }
+            });
+
+            document.getElementById('cart-paid-units').textContent = paidUnits;
+            document.getElementById('cart-comp-units').textContent = compUnits;
+            document.getElementById('cart-total-price').textContent = `$${totalDollars.toFixed(2)}`;
+        }
+
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventory-table-body');
+            const restockList = document.getElementById('quick-restock-list');
+            if (!tbody || !restockList) return;
+
+            if (STATE.flavors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:16px; color:var(--text-muted);">No flavors created yet.</td></tr>';
+                restockList.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">Add flavors first to configure starting cooler stock.</div>';
+                return;
+            }
+
+            tbody.innerHTML = STATE.flavors.map(f => {
+                const counts = getFlavorCounts(f.id);
+                const left = Math.max(0, Number(f.currentStock != null ? f.currentStock : f.startingStock) || 0);
+                return `
+                    <tr>
+                        <td>
+                            <div class="inv-flavor-cell">
+                                ${f.photo ? `<img src="${f.photo}" class="inv-thumb" alt="${f.name}">` : `<span>🍦</span>`}
+                                <span>${f.name}</span>
+                            </div>
+                        </td>
+                        <td>$${f.price.toFixed(2)}</td>
+                        <td><strong>${f.startingStock}</strong></td>
+                        <td style="color:var(--brand-pink); font-weight:700;">${counts.sold}</td>
+                        <td style="color:var(--brand-gold); font-weight:700;">${counts.comp}</td>
+                        <td><strong style="${left <= 3 ? 'color:var(--danger);' : ''}">${left}</strong></td>
+                        <td>
+                            <button class="btn-edit-outline" onclick="openEditFlavor('${f.id}')">✏️ Edit</button>
+                            <button class="btn-danger-outline" onclick="deleteFlavor('${f.id}')">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            restockList.innerHTML = STATE.flavors.map(f => `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="font-size:13px; font-weight:700;">${f.name}</span>
+                    <input type="number" id="restock-input-${f.id}" class="form-input" style="width:80px; padding:6px;" value="${f.startingStock}">
+                </div>
+            `).join('');
+        }
+
+        window.saveRestockCounts = function() {
+            STATE.flavors.forEach(f => {
+                const input = document.getElementById(`restock-input-${f.id}`);
+                if (input) {
+                    f.startingStock = parseInt(input.value) || 0;
+                    f.currentStock = f.startingStock;
+                }
+            });
+            persistState();
+            pushMenuToGoogleSheet(false);
+            renderAll();
+            alert('✅ Cooler pack inventory updated & synced to Sheet!');
+        };
+
+        function renderStats() {
+            let totalRevenue = 0;
+            let totalSold = 0;
+            let totalComp = 0;
+
+            STATE.transactions.forEach(tx => {
+                totalRevenue += (tx.totalPrice || 0);
+                totalSold += (tx.totalUnitsSold || 0);
+                totalComp += (tx.totalUnitsGiven || 0);
+            });
+
+            document.getElementById('stat-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
+            document.getElementById('stat-sold').textContent = totalSold;
+            document.getElementById('stat-comp').textContent = totalComp;
+            document.getElementById('stat-txs').textContent = STATE.transactions.length;
+
+            const log = document.getElementById('transactions-history-list');
+            if (!log) return;
+
+            if (STATE.transactions.length === 0) {
+                log.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center; padding:12px;">No transactions logged for this shift yet.</div>';
+                return;
+            }
+
+            log.innerHTML = STATE.transactions.map(tx => {
+                const itemSummary = (tx.items || []).map(it => `${it.qty}x ${it.name} ${it.isComp ? '[FREE]' : ''}`).join(', ') || tx.summary || 'Items summary';
+                return `
+                    <div style="border-bottom:1px solid var(--border-color); padding:8px 0; font-size:12px;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700;">
+                            <span>${tx.timestamp || ''} • $${(tx.totalPrice || 0).toFixed(2)}</span>
+                            <span style="color:var(--text-muted);">${tx.venue || ''}</span>
+                        </div>
+                        <div style="color:var(--text-muted); margin-top:2px;">${itemSummary}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAll() {
+            renderRegister();
+            renderInventoryTable();
+            renderStats();
+        }
+
+        window.copyGoogleDocSummary = function() {
+            let rev = 0; let sold = 0; let comp = 0;
+            STATE.transactions.forEach(t => { rev += (t.totalPrice || 0); sold += (t.totalUnitsSold || 0); comp += (t.totalUnitsGiven || 0); });
+
+            let docText = `🍦 CREAM DADDY POP-UP REPORT\n`;
+            docText += `Venue: ${STATE.venue}\nDate: ${STATE.date}\n`;
+            docText += `----------------------------------------\n`;
+            docText += `Gross Sales: $${rev.toFixed(2)}\n`;
+            docText += `Paid Pints Sold: ${sold}\n`;
+            docText += `Free / Promotional Pints: ${comp}\n`;
+            docText += `Total Containers Out: ${sold + comp}\n\n`;
+            docText += `INVENTORY BREAKDOWN:\n`;
+            STATE.flavors.forEach(f => {
+                const counts = getFlavorCounts(f.id);
+                const left = Math.max(0, Number(f.currentStock != null ? f.currentStock : f.startingStock) || 0);
+                docText += `- ${f.name}: Start: ${f.startingStock} | Sold: ${counts.sold} | Free: ${counts.comp} | Remaining: ${left}\n`;
+            });
+
+            navigator.clipboard.writeText(docText).then(() => {
+                alert('📋 Copied shift summary formatted for Google Docs!');
+            }).catch(() => {
+                alert('Shift text:\n\n' + docText);
+            });
+        };
+
+        window.exportCSV = function() {
+            let csv = "Timestamp,Venue,Date,OrderTotal,PaidUnits,FreeUnits,ItemsSummary\n";
+            STATE.transactions.forEach(t => {
+                const summary = (t.items || []).map(i => `${i.qty}x ${i.name}${i.isComp ? ' (FREE)' : ''}`).join('; ') || t.summary || '';
+                csv += `"${t.timestamp || ''}","${t.venue || ''}","${t.date || ''}",${t.totalPrice || 0},${t.totalUnitsSold || 0},${t.totalUnitsGiven || 0},"${summary}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `CreamDaddy_${STATE.venue.replace(/\s+/g, '_')}_${STATE.date}.csv`);
+            a.click();
+        };
+
+        window.testScriptSync = function() {
+            sendSheetPayload({
+                venue: STATE.venue,
+                date: STATE.date,
+                transactions: [{
+                    id: 'test_' + Date.now(),
+                    timestamp: new Date().toLocaleTimeString(),
+                    venue: STATE.venue,
+                    date: STATE.date,
+                    totalPrice: 0.00,
+                    totalUnitsSold: 0,
+                    totalUnitsGiven: 0,
+                    items: [{ qty: 1, name: "TEST PING", price: 0, isComp: true }]
+                }]
+            });
+            alert('✅ Test ping sent to Google Apps Script!');
+        };
+
+        window.generateQR = function() {
+            const qrCanvas = document.getElementById('qr-canvas');
+            const roomLabel = document.getElementById('qr-room-label');
+            if (!qrCanvas) return;
+
+            const lightweightFlavors = STATE.flavors.map(f => ({
+                id: f.id,
+                name: f.name,
+                price: f.price,
+                startingStock: f.startingStock
+            }));
+
+            const payloadData = {
+                room: STATE.syncRoom,
+                venue: STATE.venue,
+                date: STATE.date,
+                flavors: lightweightFlavors,
+                savedVenues: STATE.savedVenues
+            };
+
+            let encoded = "";
+            try {
+                encoded = encodeURIComponent(JSON.stringify(payloadData));
+            } catch(e) {
+                encoded = encodeURIComponent(STATE.syncRoom);
+            }
+
+            const currentBase = window.location.href.split('?')[0].split('#')[0];
+            const syncUrl = currentBase + '?shift=' + encoded;
+
+            if (window.QRious) {
+                new QRious({
+                    element: qrCanvas,
+                    value: syncUrl,
+                    size: 200,
+                    level: 'M'
+                });
+            }
+            if (roomLabel) roomLabel.textContent = `Room ID: ${STATE.syncRoom}`;
+        };
+
+        window.copyJoinLink = function() {
+            const lightweightFlavors = STATE.flavors.map(f => ({
+                id: f.id,
+                name: f.name,
+                price: f.price,
+                startingStock: f.startingStock
+            }));
+
+            const payloadData = {
+                room: STATE.syncRoom,
+                venue: STATE.venue,
+                date: STATE.date,
+                flavors: lightweightFlavors,
+                savedVenues: STATE.savedVenues
+            };
+
+            const encoded = encodeURIComponent(JSON.stringify(payloadData));
+            const currentBase = window.location.href.split('?')[0].split('#')[0];
+            const syncUrl = currentBase + '?shift=' + encoded;
+
+            navigator.clipboard.writeText(syncUrl).then(() => {
+                alert('📋 Copied full shift invite link to clipboard!');
+            }).catch(() => {
+                alert('Shift link:\n\n' + syncUrl);
+            });
+        };
+
+        function checkForIncomingSyncPayload() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const shiftParam = urlParams.get('shift');
+
+                if (shiftParam) {
+                    const parsed = JSON.parse(decodeURIComponent(shiftParam));
+                    if (parsed) {
+                        if (parsed.venue) STATE.venue = parsed.venue;
+                        if (parsed.date) STATE.date = parsed.date;
+                        if (parsed.room) STATE.syncRoom = parsed.room;
+                        if (Array.isArray(parsed.savedVenues) && parsed.savedVenues.length > 0) {
+                            STATE.savedVenues = parsed.savedVenues;
+                        }
+                        if (Array.isArray(parsed.flavors) && parsed.flavors.length > 0) {
+                            const localMap = new Map((STATE.flavors || []).map(f => [f.id, f.photo]));
+                            STATE.flavors = parsed.flavors.map(f => ({
+                                ...f,
+                                photo: localMap.get(f.id) || ""
+                            }));
+                        }
+                        persistState();
+                        renderAll();
+                        setTimeout(() => {
+                            alert(`🎉 Connected to Shift!\n\n📍 Venue: ${STATE.venue}\n🍦 Flavors Synced: ${STATE.flavors.length}`);
+                        }, 400);
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                        return;
+                    }
+                }
+            } catch(err) {
+                console.error("Error reading shift sync params:", err);
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+
+    if (
+        e.target.tagName === 'BUTTON' ||
+        e.target.closest('.flavor-card')
+    ) {
+        haptic('light');
+    }
+
+});window.addEventListener('DOMContentLoaded', () => {
+            loadSavedState();
+            checkForIncomingSyncPayload();
+            renderAll();
+            // Automatically fetch live menu & sales log via JSONP on launch
+            fetchFromGoogleSheet(false);
+            flushPendingWrites();
+            // Background sync polling every 45s
+            setInterval(() => fetchFromGoogleSheet(false), 45000);
+        });
+    </script>
+</body>
+</html>
