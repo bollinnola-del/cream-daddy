@@ -720,6 +720,9 @@
             </div>
             <!-- Normal checkout buttons -->
 
+            <div id="empty-cart-message" style="text-align:center;padding:12px;color:var(--text-muted);font-size:13px;">
+                Tap a flavor card below to start an order.
+            </div>
             <div id="checkout-actions" style="
                     display:grid;
                     grid-template-columns:1fr 1fr;
@@ -755,11 +758,18 @@
             </div>
         </div>
 
-        <div class="card-header-row">
-            <div class="card-title">Select Flavor</div>
-            <button class="btn-primary" onclick="openModal('flavor-modal')">+ Add Flavor</button>
-        </div>
         <div id="register-flavors-grid" class="grid-flavors"></div>
+
+        <button
+            class="btn-primary"
+            style="
+                width:100%;
+                margin-top:12px;
+            "
+            onclick="openModal('flavor-modal')"
+        >
+            + Add Flavor
+        </button>
     </div>
 
     <div id="tab-inventory" class="tab-content">
@@ -1415,23 +1425,28 @@
             renderRegister();
         };
         function showNormalCheckoutButtons() {
+            const emptyMessage = document.getElementById('empty-cart-message');
+            const checkoutActions = document.getElementById('checkout-actions');
+            const pendingActions = document.getElementById('venmo-pending-actions');
 
-            const checkoutActions =
-                document.getElementById('checkout-actions');
+            const cartHasItems = Array.isArray(STATE.cart) && STATE.cart.length > 0;
 
-            const pendingActions =
-                document.getElementById('venmo-pending-actions');
+            if (emptyMessage) {
+                emptyMessage.style.display = cartHasItems ? 'none' : 'block';
+            }
 
             if (checkoutActions) {
-                checkoutActions.style.display = 'grid';
+                checkoutActions.style.display = cartHasItems ? 'grid' : 'none';
             }
 
             if (pendingActions) {
                 pendingActions.style.display = 'none';
             }
         }
-
         function showVenmoPendingButtons() {
+            const emptyMessage = document.getElementById('empty-cart-message');
+            if (emptyMessage) emptyMessage.style.display = 'none';
+
 
             const checkoutActions =
                 document.getElementById('checkout-actions');
@@ -1581,7 +1596,6 @@
             });
             haptic('success');
 
-            alert('✅ Order completed!');
         };
 
         function renderShiftBar() {
@@ -1625,8 +1639,7 @@
             if (!cartList) return;
 
             if (STATE.cart.length === 0) {
-
-                cartList.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:13px;">Tap a flavor card below to start an order.</div>';
+                cartList.innerHTML = '';
             } else {
                 cartList.innerHTML = STATE.cart.map((it, idx) => `
                     <div class="cart-item-row">
@@ -1666,6 +1679,7 @@
             document.getElementById('cart-paid-units').textContent = paidUnits;
             document.getElementById('cart-comp-units').textContent = compUnits;
             document.getElementById('cart-total-price').textContent = `$${totalDollars.toFixed(2)}`;
+                    showNormalCheckoutButtons();
         }
 
         function renderInventoryTable() {
