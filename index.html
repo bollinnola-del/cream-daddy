@@ -675,10 +675,32 @@
             max-width: 200px;
             max-height: 200px;
         }
+
+        #access-lock {
+            position: fixed; inset: 0; z-index: 5000; display: none;
+            align-items: center; justify-content: center; padding: 20px;
+            background: var(--brand-black);
+        }
+        #access-lock.active { display: flex; }
+        .access-card { width: min(420px, 100%); background: #fff; border-radius: 16px; padding: 22px; text-align: center; }
+        .access-card h1 { font-size: 22px; margin-bottom: 8px; }
+        .access-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 14px; }
+        #helper-access-code { width: 100%; font-size: 18px; text-align: center; margin-bottom: 10px; }
+        #access-error { min-height: 20px; color: var(--danger); font-size: 13px; margin-top: 8px; }
     </style>
 </head>
 
 <body>
+    <div id="access-lock" class="active" aria-modal="true" role="dialog">
+        <div class="access-card">
+            <div style="font-size:42px;margin-bottom:8px;">🍦</div>
+            <h1>Cream Daddy Team Access</h1>
+            <p>Enter the helper access code. This device stays unlocked for 24 hours.</p>
+            <input id="helper-access-code" class="form-input" type="password" autocomplete="current-password" placeholder="Access code">
+            <button id="unlock-register" class="btn-primary" style="width:100%;padding:12px;" onclick="authorizeHelper()">Unlock Register</button>
+            <div id="access-error" role="alert"></div>
+        </div>
+    </div>
     <header>
         <div class="logo-container">
             <img src="https://davita-production-be.glean.com/api/v1/downloadchatfile/4659584f359c48b1ac757568b33b6401"
@@ -739,6 +761,12 @@
 
             </div>
 
+            <!-- Only shown when every item in the cart is free -->
+            <div id="gift-actions" style="display:none;">
+                <button class="btn-checkout" style="background:#10b981;color:#fff;" onclick="completeSale('gift')">
+                    🎁 Gift
+                </button>
+            </div>
             <!-- Only shown after Card is pressed -->
 
             <div id="venmo-pending-actions" style="
@@ -1023,6 +1051,66 @@
             }
         }
 
+        const AUTH_TOKEN_KEY = 'cream_daddy_auth_token';
+        const AUTH_EXPIRY_KEY = 'cream_daddy_auth_expiry';
+
+        function getAccessToken() {
+            const token = localStorage.getItem(AUTH_TOKEN_KEY) || '';
+            const expiry = Number(localStorage.getItem(AUTH_EXPIRY_KEY) || 0);
+            if (!token || Date.now() >= expiry) {
+                localStorage.removeItem(AUTH_TOKEN_KEY);
+                localStorage.removeItem(AUTH_EXPIRY_KEY);
+                return '';
+            }
+            return token;
+        }
+
+        function setLocked(isLocked, message = '') {
+            const lock = document.getElementById('access-lock');
+            const error = document.getElementById('access-error');
+            if (lock) lock.classList.toggle('active', isLocked);
+            if (error) error.textContent = message;
+            document.body.style.overflow = isLocked ? 'hidden' : '';
+        }
+
+        function clearAuthorization(message = 'Please enter the helper access code.') {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            localStorage.removeItem(AUTH_EXPIRY_KEY);
+            setLocked(true, message);
+        }
+
+        window.handleHelperAuthorization = function(data) {
+            if (data && data.status === 'success' && data.token && data.expiresAt) {
+                localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+                localStorage.setItem(AUTH_EXPIRY_KEY, String(data.expiresAt));
+                document.getElementById('helper-access-code').value = '';
+                setLocked(false);
+                haptic('success');
+                fetchFromGoogleSheet(false);
+            } else {
+                clearAuthorization((data && data.message) || 'Incorrect access code.');
+                haptic('error');
+            }
+        };
+
+        window.authorizeHelper = function() {
+            const input = document.getElementById('helper-access-code');
+            const code = (input && input.value || '').trim();
+            if (!code) {
+                setLocked(true, 'Enter the helper access code.');
+                return;
+            }
+            document.getElementById('access-error').textContent = 'Checking access…';
+            const old = document.getElementById('helper-auth-script');
+            if (old) old.remove();
+            const script = document.createElement('script');
+            script.id = 'helper-auth-script';
+            script.src = STATE.scriptUrl + '?action=authorize&accessCode=' + encodeURIComponent(code)
+                + '&callback=handleHelperAuthorization&t=' + Date.now();
+            script.onerror = () => setLocked(true, 'Could not contact the server. Check connectivity and try again.');
+            document.body.appendChild(script);
+        };
+
         function loadSavedState() {
             try {
                 const saved = localStorage.getItem('cream_daddy_pos_data');
@@ -1053,6 +1141,11 @@
 
         // Robust cross-origin communication with Google Apps Script using JSONP
         window.handleGoogleSheetSyncResponse = function (data) {
+            if (data && data.status === 'error' && data.code === 'UNAUTHORIZED') {
+                STATE.isSyncing = false;
+                clearAuthorization(data.message || 'Authorization expired.');
+                return;
+            }
             if (data && data.status === 'success') {
                 if (Array.isArray(data.flavors)) {
                     const localPhotoMap = new Map((STATE.flavors || []).map(f => [f.name.toLowerCase().trim(), f.photo]));
@@ -1078,6 +1171,11 @@
         };
 
         function fetchFromGoogleSheet(isManual = false) {
+            const token = getAccessToken();
+            if (!token) {
+                setLocked(true);
+                return;
+            }
             if (STATE.isSyncing) return;
             STATE.isSyncing = true;
             window._isUserSyncManual = isManual;
@@ -1088,7 +1186,7 @@
 
             const script = document.createElement('script');
             script.id = 'jsonp-sync-script';
-            script.src = STATE.scriptUrl + '?action=pull_all&callback=handleGoogleSheetSyncResponse&t=' + Date.now();
+            script.src = STATE.scriptUrl + '?action=pull_all&token=' + encodeURIComponent(token) + '&callback=handleGoogleSheetSyncResponse&t=' + Date.now();
             script.onerror = function () {
                 console.warn('JSONP network notice (retaining local offline state)');
                 STATE.isSyncing = false;
@@ -1098,7 +1196,13 @@
         }
 
         async function sendSheetPayload(payloadObj) {
-            const body = JSON.stringify(payloadObj);
+            const token = getAccessToken();
+            if (!token) {
+                clearAuthorization('Authorization required before saving.');
+                return false;
+            }
+            const securedPayload = { ...payloadObj, token };
+            const body = JSON.stringify(securedPayload);
             try {
                 updateSyncHeaderStatus('☁️ Saving...');
                 await fetch(STATE.scriptUrl, {
@@ -1427,40 +1531,35 @@
         function showNormalCheckoutButtons() {
             const emptyMessage = document.getElementById('empty-cart-message');
             const checkoutActions = document.getElementById('checkout-actions');
+            const giftActions = document.getElementById('gift-actions');
             const pendingActions = document.getElementById('venmo-pending-actions');
 
             const cartHasItems = Array.isArray(STATE.cart) && STATE.cart.length > 0;
+            const allItemsFree = cartHasItems && STATE.cart.every(item => item.isComp === true);
 
             if (emptyMessage) {
                 emptyMessage.style.display = cartHasItems ? 'none' : 'block';
             }
-
             if (checkoutActions) {
-                checkoutActions.style.display = cartHasItems ? 'grid' : 'none';
+                checkoutActions.style.display = cartHasItems && !allItemsFree ? 'grid' : 'none';
             }
-
+            if (giftActions) {
+                giftActions.style.display = allItemsFree ? 'block' : 'none';
+            }
             if (pendingActions) {
                 pendingActions.style.display = 'none';
             }
         }
         function showVenmoPendingButtons() {
             const emptyMessage = document.getElementById('empty-cart-message');
+            const checkoutActions = document.getElementById('checkout-actions');
+            const giftActions = document.getElementById('gift-actions');
+            const pendingActions = document.getElementById('venmo-pending-actions');
+
             if (emptyMessage) emptyMessage.style.display = 'none';
-
-
-            const checkoutActions =
-                document.getElementById('checkout-actions');
-
-            const pendingActions =
-                document.getElementById('venmo-pending-actions');
-
-            if (checkoutActions) {
-                checkoutActions.style.display = 'none';
-            }
-
-            if (pendingActions) {
-                pendingActions.style.display = 'grid';
-            }
+            if (checkoutActions) checkoutActions.style.display = 'none';
+            if (giftActions) giftActions.style.display = 'none';
+            if (pendingActions) pendingActions.style.display = 'grid';
         }
         window.startVenmoTransaction = function () {
 
@@ -1944,6 +2043,11 @@
             }
         }
 
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && document.getElementById('access-lock')?.classList.contains('active')) {
+                authorizeHelper();
+            }
+        });
         document.addEventListener('click', (e) => {
 
             if (
@@ -1974,9 +2078,14 @@
                 showNormalCheckoutButtons();
 
             }
-            // Automatically fetch live menu & sales log via JSONP on launch
-            fetchFromGoogleSheet(false);
-            flushPendingWrites();
+            // Only contact the Sheet after this device has a valid 24-hour authorization.
+            if (getAccessToken()) {
+                setLocked(false);
+                fetchFromGoogleSheet(false);
+                flushPendingWrites();
+            } else {
+                setLocked(true);
+            }
             // Background sync polling every 45s
             setInterval(() => fetchFromGoogleSheet(false), 45000);
         });
