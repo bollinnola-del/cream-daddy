@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,7 +9,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#111111">
     <title>Cream Daddy Sales</title>
-    <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Cream%20Daddy%20Sales%22%2C%22short_name%22%3A%22CreamDaddy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23111111%22%2C%22theme_color%22%3A%22%23111111%22%7D">
+    <link rel="manifest"
+        href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Cream%20Daddy%20Sales%22%2C%22short_name%22%3A%22CreamDaddy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23111111%22%2C%22theme_color%22%3A%22%23111111%22%7D">
     <style>
         :root {
             --brand-pink: #e83393;
@@ -50,7 +51,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
         }
 
         .logo-container {
@@ -119,7 +120,7 @@
             display: flex;
             height: 65px;
             z-index: 100;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .nav-item {
@@ -164,7 +165,7 @@
             margin-bottom: 20px;
         }
 
-            .flavor-card {
+        .flavor-card {
             background: var(--card-bg);
             border: 2px solid var(--border-color);
             border-radius: 12px;
@@ -194,10 +195,10 @@
         }
 
         .flavor-img-wrapper {
-        width: 32px;
-        height: 32px;
-        margin: 0;
-         }
+            width: 32px;
+            height: 32px;
+            margin: 0;
+        }
 
         .flavor-img-wrapper img {
             width: 100%;
@@ -242,7 +243,7 @@
             border: 2px solid var(--brand-black);
             border-radius: 14px;
             padding: 14px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
             margin-bottom: 20px;
         }
 
@@ -420,7 +421,7 @@
             border: 1px solid var(--border-color);
             padding: 16px;
             margin-bottom: 14px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
         }
 
         .card-header-row {
@@ -563,7 +564,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -676,10 +677,13 @@
         }
     </style>
 </head>
+
 <body>
     <header>
         <div class="logo-container">
-            <img src="https://davita-production-be.glean.com/api/v1/downloadchatfile/4659584f359c48b1ac757568b33b6401" alt="Cream Daddy Logo" class="brand-logo-img" onerror="this.outerHTML='<h2 style=\'color:var(--brand-pink);\'>🍦 CREAM DADDY</h2>'">
+            <img src="https://davita-production-be.glean.com/api/v1/downloadchatfile/4659584f359c48b1ac757568b33b6401"
+                alt="Cream Daddy Logo" class="brand-logo-img"
+                onerror="this.outerHTML='<h2 style=\'color:var(--brand-pink);\'>🍦 CREAM DADDY</h2>'">
         </div>
         <div class="header-actions">
             <button class="btn-header-sync" onclick="openModal('sync-modal')">☁️ Cloud Sync</button>
@@ -714,17 +718,38 @@
                     <span id="cart-total-price">$0.00</span>
                 </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <!-- Normal checkout buttons -->
 
-                <button class="btn-checkout"
-                        onclick="completeSale('cash')">
+            <div id="checkout-actions" style="
+                    display:grid;
+                    grid-template-columns:1fr 1fr;
+                    gap:10px;
+                ">
+
+                <button class="btn-checkout" onclick="completeSale('cash')">
                     💵 Cash
                 </button>
 
-                <button class="btn-checkout"
-                        style="background:#fabc15;color:#111;"
-                        onclick="startVenmoTransaction()">
+                <button class="btn-checkout" style="background:#fabc15;color:#111;" onclick="startVenmoTransaction()">
                     💳 Card
+                </button>
+
+            </div>
+
+            <!-- Only shown after Card is pressed -->
+
+            <div id="venmo-pending-actions" style="
+                    display:none;
+                    grid-template-columns:1fr 1fr;
+                    gap:10px;
+                ">
+
+                <button class="btn-checkout" style="background:#ef4444;color:#fff;" onclick="cancelVenmoPayment()">
+                    ✕ Cancel
+                </button>
+
+                <button class="btn-checkout" style="background:#10b981;color:#fff;" onclick="confirmVenmoPayment()">
+                    ✓ Confirm Payment
                 </button>
 
             </div>
@@ -765,9 +790,11 @@
             <div class="card-header-row">
                 <div class="card-title">Restock Cooler</div>
             </div>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Quickly update starting pack counts for today's venue shift.</p>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Quickly update starting pack
+                counts for today's venue shift.</p>
             <div id="quick-restock-list"></div>
-            <button class="btn-gold" style="width: 100%; margin-top: 10px;" onclick="saveRestockCounts()">Save Cooler Counts</button>
+            <button class="btn-gold" style="width: 100%; margin-top: 10px;" onclick="saveRestockCounts()">Save Cooler
+                Counts</button>
         </div>
     </div>
 
@@ -794,7 +821,8 @@
         <div class="card">
             <div class="card-title" style="margin-bottom: 10px;">📄 Export Shift Data</div>
             <div style="display: flex; gap: 8px;">
-                <button class="btn-primary" style="flex:1;" onclick="copyGoogleDocSummary()">📋 Copy for Google Docs</button>
+                <button class="btn-primary" style="flex:1;" onclick="copyGoogleDocSummary()">📋 Copy for Google
+                    Docs</button>
                 <button class="btn-gold" style="flex:1;" onclick="exportCSV()">📊 Export CSV (Sheets)</button>
             </div>
         </div>
@@ -828,11 +856,15 @@
             <div class="photo-picker-box">
                 <div class="form-label">📸 Take Photo or Upload Image</div>
                 <div class="photo-btn-group">
-                    <button class="btn-primary" type="button" onclick="document.getElementById('flavor-camera-input').click()">📷 Take Photo</button>
-                    <button class="btn-secondary" type="button" onclick="document.getElementById('flavor-gallery-input').click()">🖼️ Upload File</button>
+                    <button class="btn-primary" type="button"
+                        onclick="document.getElementById('flavor-camera-input').click()">📷 Take Photo</button>
+                    <button class="btn-secondary" type="button"
+                        onclick="document.getElementById('flavor-gallery-input').click()">🖼️ Upload File</button>
                 </div>
-                <input type="file" id="flavor-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event, 'flavor-photo-preview')">
-                <input type="file" id="flavor-gallery-input" accept="image/*" style="display:none;" onchange="handleImageUpload(event, 'flavor-photo-preview')">
+                <input type="file" id="flavor-camera-input" accept="image/*" capture="environment" style="display:none;"
+                    onchange="handleImageUpload(event, 'flavor-photo-preview')">
+                <input type="file" id="flavor-gallery-input" accept="image/*" style="display:none;"
+                    onchange="handleImageUpload(event, 'flavor-photo-preview')">
                 <img id="flavor-photo-preview" class="photo-preview" alt="Preview">
             </div>
             <div class="form-group">
@@ -847,7 +879,8 @@
                 <label class="form-label">Starting Cooler Stock</label>
                 <input type="number" id="new-flavor-stock" class="form-input" value="12">
             </div>
-            <button class="btn-primary" style="width: 100%; padding: 12px;" onclick="saveNewFlavor()">Save to Menu</button>
+            <button class="btn-primary" style="width: 100%; padding: 12px;" onclick="saveNewFlavor()">Save to
+                Menu</button>
         </div>
     </div>
 
@@ -860,11 +893,15 @@
             <div class="photo-picker-box">
                 <div class="form-label">📸 Update Flavor Photo</div>
                 <div class="photo-btn-group">
-                    <button class="btn-primary" type="button" onclick="document.getElementById('edit-camera-input').click()">📷 Take Photo</button>
-                    <button class="btn-secondary" type="button" onclick="document.getElementById('edit-gallery-input').click()">🖼️ Upload File</button>
+                    <button class="btn-primary" type="button"
+                        onclick="document.getElementById('edit-camera-input').click()">📷 Take Photo</button>
+                    <button class="btn-secondary" type="button"
+                        onclick="document.getElementById('edit-gallery-input').click()">🖼️ Upload File</button>
                 </div>
-                <input type="file" id="edit-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleImageUpload(event, 'edit-photo-preview')">
-                <input type="file" id="edit-gallery-input" accept="image/*" style="display:none;" onchange="handleImageUpload(event, 'edit-photo-preview')">
+                <input type="file" id="edit-camera-input" accept="image/*" capture="environment" style="display:none;"
+                    onchange="handleImageUpload(event, 'edit-photo-preview')">
+                <input type="file" id="edit-gallery-input" accept="image/*" style="display:none;"
+                    onchange="handleImageUpload(event, 'edit-photo-preview')">
                 <img id="edit-photo-preview" class="photo-preview" alt="Preview">
             </div>
             <div class="form-group">
@@ -879,7 +916,8 @@
                 <label class="form-label">Starting Cooler Stock</label>
                 <input type="number" id="edit-flavor-stock" class="form-input">
             </div>
-            <button class="btn-primary" style="width: 100%; padding: 12px;" onclick="saveEditedFlavor()">Save Changes</button>
+            <button class="btn-primary" style="width: 100%; padding: 12px;" onclick="saveEditedFlavor()">Save
+                Changes</button>
         </div>
     </div>
 
@@ -895,7 +933,8 @@
                 <label class="form-label">Date</label>
                 <input type="date" id="venue-date" class="form-input">
             </div>
-            <button class="btn-primary" style="width: 100%; margin-bottom: 16px;" onclick="saveVenue()">Set Active Venue</button>
+            <button class="btn-primary" style="width: 100%; margin-bottom: 16px;" onclick="saveVenue()">Set Active
+                Venue</button>
             <div class="card-title" style="font-size: 14px; margin-bottom: 8px;">Saved Venues</div>
             <div id="saved-venues-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
         </div>
@@ -905,22 +944,29 @@
         <div class="modal-box">
             <button class="btn-modal-close" onclick="closeModal('sync-modal')">&times;</button>
             <div class="modal-title">☁️ Team & Cloud Sync</div>
-            
-            <p style="font-size: 13px; font-weight:700; color: var(--brand-black); margin-bottom: 4px;">1. Live Google Sheets Integration</p>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Connected to your Google Sheet master record. Menu items, photos, and sales sync in real time.</p>
+
+            <p style="font-size: 13px; font-weight:700; color: var(--brand-black); margin-bottom: 4px;">1. Live Google
+                Sheets Integration</p>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Connected to your Google Sheet
+                master record. Menu items, photos, and sales sync in real time.</p>
             <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                <button class="btn-primary" style="flex:1;" onclick="fetchFromGoogleSheet(true)">🔄 Pull from Sheet</button>
-                <button class="btn-secondary" style="flex:1;" onclick="pushMenuToGoogleSheet(true)">⬆️ Push Menu</button>
+                <button class="btn-primary" style="flex:1;" onclick="fetchFromGoogleSheet(true)">🔄 Pull from
+                    Sheet</button>
+                <button class="btn-secondary" style="flex:1;" onclick="pushMenuToGoogleSheet(true)">⬆️ Push
+                    Menu</button>
                 <button class="btn-gold" onclick="testScriptSync()">🧪 Ping</button>
             </div>
 
             <hr style="margin: 14px 0; border: none; border-top: 1px solid var(--border-color);">
 
-            <p style="font-size: 13px; font-weight:700; color: var(--brand-black); margin-bottom: 4px;">2. Scan to Join Shift (Helper QR)</p>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Scan with any second phone to instantly load current shift inventory.</p>
+            <p style="font-size: 13px; font-weight:700; color: var(--brand-black); margin-bottom: 4px;">2. Scan to Join
+                Shift (Helper QR)</p>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">Scan with any second phone to
+                instantly load current shift inventory.</p>
             <div id="qr-canvas-container">
                 <canvas id="qr-canvas"></canvas>
-                <span id="qr-room-label" style="font-size: 12px; font-weight: 800; margin-top: 8px; color: var(--brand-pink);"></span>
+                <span id="qr-room-label"
+                    style="font-size: 12px; font-weight: 800; margin-top: 8px; color: var(--brand-pink);"></span>
             </div>
             <div style="display: flex; gap: 8px;">
                 <button class="btn-gold" style="width: 100%;" onclick="copyJoinLink()">📋 Copy Join Link</button>
@@ -930,7 +976,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     <script>
-        const HARDCODED_WEBHOOK = "https://script.google.com/macros/s/AKfycbyivvuwjWAkyGO6E7ooPaovbHXDnYvKXrQF0nflaB4eYD7SG3MdvdxcJJYDj0BWsfc7Ig/exec";
+        const HARDCODED_WEBHOOK = "https://script.google.com/macros/s/AKfycbxgCmXizdbMFcxaWJQbo0kX29JGy5Lhq-sccW7orquhq1zHYbo1hCI3XOtQ1x2BvUjt/exec";
 
         const STATE = {
             venue: "Daily Pop-Up",
@@ -943,29 +989,29 @@
             scriptUrl: HARDCODED_WEBHOOK,
             tempPhotoBase64: "",
             isSyncing: false
-        };function haptic(type = 'light') {
+        }; function haptic(type = 'light') {
 
-    if (!navigator.vibrate) return;
+            if (!navigator.vibrate) return;
 
-    switch(type) {
+            switch (type) {
 
-        case 'light':
-            navigator.vibrate(15);
-            break;
+                case 'light':
+                    navigator.vibrate(15);
+                    break;
 
-        case 'medium':
-            navigator.vibrate(40);
-            break;
+                case 'medium':
+                    navigator.vibrate(40);
+                    break;
 
-        case 'success':
-            navigator.vibrate([40,30,80]);
-            break;
+                case 'success':
+                    navigator.vibrate([40, 30, 80]);
+                    break;
 
-        case 'error':
-            navigator.vibrate([100,50,100]);
-            break;
-    }
-}
+                case 'error':
+                    navigator.vibrate([100, 50, 100]);
+                    break;
+            }
+        }
 
         function loadSavedState() {
             try {
@@ -979,7 +1025,7 @@
                     if (parsed.transactions) STATE.transactions = parsed.transactions;
                     if (parsed.syncRoom) STATE.syncRoom = parsed.syncRoom;
                 }
-            } catch(e) {}
+            } catch (e) { }
         }
 
         function persistState() {
@@ -992,11 +1038,11 @@
                     transactions: STATE.transactions,
                     syncRoom: STATE.syncRoom
                 }));
-            } catch(e) {}
+            } catch (e) { }
         }
 
         // Robust cross-origin communication with Google Apps Script using JSONP
-        window.handleGoogleSheetSyncResponse = function(data) {
+        window.handleGoogleSheetSyncResponse = function (data) {
             if (data && data.status === 'success') {
                 if (Array.isArray(data.flavors)) {
                     const localPhotoMap = new Map((STATE.flavors || []).map(f => [f.name.toLowerCase().trim(), f.photo]));
@@ -1033,7 +1079,7 @@
             const script = document.createElement('script');
             script.id = 'jsonp-sync-script';
             script.src = STATE.scriptUrl + '?action=pull_all&callback=handleGoogleSheetSyncResponse&t=' + Date.now();
-            script.onerror = function() {
+            script.onerror = function () {
                 console.warn('JSONP network notice (retaining local offline state)');
                 STATE.isSyncing = false;
                 updateSyncHeaderStatus('☁️ Local Ready');
@@ -1090,7 +1136,7 @@
             if (btn) btn.textContent = text;
         }
 
-        window.switchTab = function(tabId, el) {
+        window.switchTab = function (tabId, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
             const target = document.getElementById(tabId);
@@ -1100,7 +1146,7 @@
             renderInventoryTable();
         };
 
-        window.openModal = function(id) {
+        window.openModal = function (id) {
             const modal = document.getElementById(id);
             if (modal) {
                 modal.classList.add('active');
@@ -1115,18 +1161,18 @@
             }
         };
 
-        window.closeModal = function(id) {
+        window.closeModal = function (id) {
             const modal = document.getElementById(id);
             if (modal) modal.classList.remove('active');
         };
 
-        window.handleImageUpload = function(e, previewId) {
+        window.handleImageUpload = function (e, previewId) {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(evt) {
+            reader.onload = function (evt) {
                 const img = new Image();
-                img.onload = function() {
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
                     const maxDim = 140; // optimized for Google Sheet cell limits
                     let width = img.width;
@@ -1158,7 +1204,7 @@
             reader.readAsDataURL(file);
         };
 
-        window.saveNewFlavor = function() {
+        window.saveNewFlavor = function () {
             const nameInput = document.getElementById('new-flavor-name');
             const priceInput = document.getElementById('new-flavor-price');
             const stockInput = document.getElementById('new-flavor-stock');
@@ -1196,7 +1242,7 @@
             renderAll();
         };
 
-        window.openEditFlavor = function(id) {
+        window.openEditFlavor = function (id) {
             const flavor = STATE.flavors.find(f => f.id === id);
             if (!flavor) return;
 
@@ -1217,7 +1263,7 @@
             openModal('edit-flavor-modal');
         };
 
-        window.saveEditedFlavor = function() {
+        window.saveEditedFlavor = function () {
             const id = document.getElementById('edit-flavor-id').value;
             const flavor = STATE.flavors.find(f => f.id === id);
             if (!flavor) return;
@@ -1243,7 +1289,7 @@
             renderAll();
         };
 
-        window.deleteFlavor = function(id) {
+        window.deleteFlavor = function (id) {
             if (confirm("Delete this flavor from the inventory and menu?")) {
                 STATE.flavors = STATE.flavors.filter(f => f.id !== id);
                 STATE.cart = STATE.cart.filter(c => c.flavorId !== id);
@@ -1253,7 +1299,7 @@
             }
         };
 
-        window.saveVenue = function() {
+        window.saveVenue = function () {
             const venue = document.getElementById('venue-input').value.trim() || "Daily Pop-Up";
             const date = document.getElementById('venue-date').value || new Date().toISOString().split('T')[0];
 
@@ -1269,14 +1315,14 @@
             renderShiftBar();
         };
 
-        window.selectSavedVenue = function(v) {
+        window.selectSavedVenue = function (v) {
             STATE.venue = v;
             persistState();
             closeModal('venue-modal');
             renderShiftBar();
         };
 
-        window.deleteSavedVenue = function(v) {
+        window.deleteSavedVenue = function (v) {
             STATE.savedVenues = STATE.savedVenues.filter(item => item !== v);
             persistState();
             renderSavedVenues();
@@ -1318,7 +1364,7 @@
             return Math.max(0, sheetStock - staged);
         }
 
-        window.addToCart = function(flavorId) {
+        window.addToCart = function (flavorId) {
             haptic('light');
             const flavor = STATE.flavors.find(f => f.id === flavorId);
             if (!flavor) return;
@@ -1345,7 +1391,7 @@
             renderRegister();
         };
 
-        window.changeCartQty = function(index, delta) {
+        window.changeCartQty = function (index, delta) {
             haptic('light');
             const item = STATE.cart[index];
             if (!item) return;
@@ -1356,7 +1402,7 @@
             renderRegister();
         };
 
-        window.toggleCartComp = function(index) {
+        window.toggleCartComp = function (index) {
             haptic('medium');
             const item = STATE.cart[index];
             if (!item) return;
@@ -1364,11 +1410,44 @@
             renderRegister();
         };
 
-        window.clearCart = function() {
+        window.clearCart = function () {
             STATE.cart = [];
             renderRegister();
         };
-        window.startVenmoTransaction = function() {
+        function showNormalCheckoutButtons() {
+
+            const checkoutActions =
+                document.getElementById('checkout-actions');
+
+            const pendingActions =
+                document.getElementById('venmo-pending-actions');
+
+            if (checkoutActions) {
+                checkoutActions.style.display = 'grid';
+            }
+
+            if (pendingActions) {
+                pendingActions.style.display = 'none';
+            }
+        }
+
+        function showVenmoPendingButtons() {
+
+            const checkoutActions =
+                document.getElementById('checkout-actions');
+
+            const pendingActions =
+                document.getElementById('venmo-pending-actions');
+
+            if (checkoutActions) {
+                checkoutActions.style.display = 'none';
+            }
+
+            if (pendingActions) {
+                pendingActions.style.display = 'grid';
+            }
+        }
+        window.startVenmoTransaction = function () {
 
             if (STATE.cart.length === 0) {
 
@@ -1379,41 +1458,62 @@
                 return;
             }
 
-            const total = STATE.cart.reduce((sum, item) => {
-
-                return sum + (
-                    item.isComp
-                        ? 0
-                        : item.qty * item.price
-                );
-
-            }, 0);
-
-            const venmoUser = "creamdaddynola";
-
-            const note =
-                `Cream Daddy ${STATE.venue} ${STATE.date}`;
-
-            const venmoUrl =
-                `venmo://paycharge?txn=pay` +
-                `&recipients=${venmoUser}` +
-                `&amount=${total.toFixed(2)}` +
-                `&note=${encodeURIComponent(note)}`;
+            showVenmoPendingButtons();
 
             haptic('medium');
 
-            window.location.href = venmoUrl;
+            sessionStorage.setItem(
+                'cream_daddy_venmo_pending',
+                'true'
+            );
 
-            if (
-                confirm(
-                    "Did the Venmo payment complete successfully?"
-                )
-            ) {
-                completeSale('card');
-            }
+            window.location.href = "venmo://";
         };
-        window.completeSale = function(paymentMethod='cash') {
-            
+        window.confirmVenmoPayment = function () {
+
+            if (STATE.cart.length === 0) {
+
+                sessionStorage.removeItem(
+                    'cream_daddy_venmo_pending'
+                );
+
+                showNormalCheckoutButtons();
+
+                haptic('error');
+
+                alert(
+                    'The pending order no longer contains any items.'
+                );
+
+                return;
+            }
+
+            completeSale('card');
+
+            sessionStorage.removeItem(
+                'cream_daddy_venmo_pending'
+            );
+
+            showNormalCheckoutButtons();
+        };
+        window.cancelVenmoPayment = function () {
+
+            sessionStorage.removeItem(
+                'cream_daddy_venmo_pending'
+            );
+
+            STATE.cart = [];
+
+            persistState();
+
+            renderRegister();
+
+            showNormalCheckoutButtons();
+
+            haptic('medium');
+        };
+        window.completeSale = function (paymentMethod = 'cash') {
+
             if (STATE.cart.length === 0) {
                 haptic('error');
 
@@ -1437,26 +1537,26 @@
 
             const tx = {
 
-            id: 'tx_' + Date.now(),
+                id: 'tx_' + Date.now(),
 
-            timestamp: new Date().toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit'
-            }),
+                timestamp: new Date().toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }),
 
-            date: STATE.date,
+                date: STATE.date,
 
-            venue: STATE.venue,
+                venue: STATE.venue,
 
-            paymentMethod: paymentMethod,
+                paymentMethod: paymentMethod,
 
-            items: orderItems,
+                items: orderItems,
 
-            totalPrice: totalPrice,
+                totalPrice: totalPrice,
 
-            totalUnitsSold: totalUnitsSold,
+                totalUnitsSold: totalUnitsSold,
 
-            totalUnitsGiven: totalUnitsGiven
+                totalUnitsGiven: totalUnitsGiven
 
             };
 
@@ -1480,7 +1580,7 @@
                 transactions: [tx]
             });
             haptic('success');
-            
+
             alert('✅ Order completed!');
         };
 
@@ -1525,7 +1625,7 @@
             if (!cartList) return;
 
             if (STATE.cart.length === 0) {
-            
+
                 cartList.innerHTML = '<div style="text-align:center; padding:12px; color:var(--text-muted); font-size:13px;">Tap a flavor card below to start an order.</div>';
             } else {
                 cartList.innerHTML = STATE.cart.map((it, idx) => `
@@ -1611,7 +1711,7 @@
             `).join('');
         }
 
-        window.saveRestockCounts = function() {
+        window.saveRestockCounts = function () {
             STATE.flavors.forEach(f => {
                 const input = document.getElementById(`restock-input-${f.id}`);
                 if (input) {
@@ -1669,7 +1769,7 @@
             renderStats();
         }
 
-        window.copyGoogleDocSummary = function() {
+        window.copyGoogleDocSummary = function () {
             let rev = 0; let sold = 0; let comp = 0;
             STATE.transactions.forEach(t => { rev += (t.totalPrice || 0); sold += (t.totalUnitsSold || 0); comp += (t.totalUnitsGiven || 0); });
 
@@ -1694,7 +1794,7 @@
             });
         };
 
-        window.exportCSV = function() {
+        window.exportCSV = function () {
             let csv = "Timestamp,Venue,Date,OrderTotal,PaidUnits,FreeUnits,ItemsSummary\n";
             STATE.transactions.forEach(t => {
                 const summary = (t.items || []).map(i => `${i.qty}x ${i.name}${i.isComp ? ' (FREE)' : ''}`).join('; ') || t.summary || '';
@@ -1709,7 +1809,7 @@
             a.click();
         };
 
-        window.testScriptSync = function() {
+        window.testScriptSync = function () {
             sendSheetPayload({
                 venue: STATE.venue,
                 date: STATE.date,
@@ -1727,7 +1827,7 @@
             alert('✅ Test ping sent to Google Apps Script!');
         };
 
-        window.generateQR = function() {
+        window.generateQR = function () {
             const qrCanvas = document.getElementById('qr-canvas');
             const roomLabel = document.getElementById('qr-room-label');
             if (!qrCanvas) return;
@@ -1750,7 +1850,7 @@
             let encoded = "";
             try {
                 encoded = encodeURIComponent(JSON.stringify(payloadData));
-            } catch(e) {
+            } catch (e) {
                 encoded = encodeURIComponent(STATE.syncRoom);
             }
 
@@ -1768,7 +1868,7 @@
             if (roomLabel) roomLabel.textContent = `Room ID: ${STATE.syncRoom}`;
         };
 
-        window.copyJoinLink = function() {
+        window.copyJoinLink = function () {
             const lightweightFlavors = STATE.flavors.map(f => ({
                 id: f.id,
                 name: f.name,
@@ -1825,24 +1925,41 @@
                         return;
                     }
                 }
-            } catch(err) {
+            } catch (err) {
                 console.error("Error reading shift sync params:", err);
             }
         }
 
         document.addEventListener('click', (e) => {
 
-    if (
-        e.target.tagName === 'BUTTON' ||
-        e.target.closest('.flavor-card')
-    ) {
-        haptic('light');
-    }
+            if (
+                e.target.tagName === 'BUTTON' ||
+                e.target.closest('.flavor-card')
+            ) {
+                haptic('light');
+            }
 
-});window.addEventListener('DOMContentLoaded', () => {
+        }); window.addEventListener('DOMContentLoaded', () => {
             loadSavedState();
             checkForIncomingSyncPayload();
             renderAll();
+            const venmoPaymentPending =
+                sessionStorage.getItem(
+                    'cream_daddy_venmo_pending'
+                ) === 'true';
+
+            if (
+                venmoPaymentPending &&
+                STATE.cart.length > 0
+            ) {
+
+                showVenmoPendingButtons();
+
+            } else {
+
+                showNormalCheckoutButtons();
+
+            }
             // Automatically fetch live menu & sales log via JSONP on launch
             fetchFromGoogleSheet(false);
             flushPendingWrites();
@@ -1851,4 +1968,5 @@
         });
     </script>
 </body>
+
 </html>
