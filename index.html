@@ -777,6 +777,16 @@
             #tab-stats .stat-value { font-size:18px !important; }
             .stats-date-radio-group { display:grid; grid-template-columns:1fr; }
         }
+
+        /* Stats UI V3.3.2 */
+        .stats-venue-multiselect {
+            width: 100%; min-height: 118px; padding: 6px;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            background: #fff; font: inherit;
+        }
+        .stats-venue-multiselect option { padding: 7px 8px; }
+        .stats-filter-helper { margin-top: 4px; font-size: 10px; color: var(--text-muted); }
+        #stats-date-mode { min-height: 42px; }
     </style>
 </head>
 
@@ -927,6 +937,46 @@
     </div>
 
     <div id="tab-stats" class="tab-content">
+        <div class="card" id="stats-filter-card">
+            <div class="card-header-row">
+                <div class="card-title">🔎 Analytics Filters</div>
+                <button class="btn-secondary stats-reset-button" type="button" onclick="clearStatsFilters()">Reset</button>
+            </div>
+            <div class="stats-filter-grid">
+                <div class="stats-filter-field">
+                    <label for="stats-venue-filter">Venue</label>
+                    <select id="stats-venue-filter" class="stats-venue-multiselect" multiple size="4" onchange="updateStatsFilters()">
+                        <option value="ALL">All Venues</option>
+                    </select>
+                    <div class="stats-filter-helper">Select one or more venues. Select All Venues to clear venue-specific filtering.</div>
+                </div>
+                <div class="stats-filter-field">
+                    <label for="stats-date-mode">Date</label>
+                    <select id="stats-date-mode" class="form-input" onchange="updateStatsFilterVisibility(); updateStatsFilters();">
+                        <option value="ALL_TIME">All Time</option>
+                        <option value="SINGLE_DATE">Individual Date</option>
+                        <option value="CUSTOM_RANGE">Custom Range</option>
+                    </select>
+                </div>
+            </div>
+            <div id="stats-single-date-fields" class="stats-date-fields" style="display:none;">
+                <div class="stats-filter-field">
+                    <label for="stats-single-date">Select date</label>
+                    <input id="stats-single-date" class="form-input" type="date" onchange="updateStatsFilters()">
+                </div>
+            </div>
+            <div id="stats-custom-range-fields" class="stats-date-fields stats-filter-grid" style="display:none;">
+                <div class="stats-filter-field">
+                    <label for="stats-start-date">From</label>
+                    <input id="stats-start-date" class="form-input" type="date" onchange="updateStatsFilters()">
+                </div>
+                <div class="stats-filter-field">
+                    <label for="stats-end-date">To</label>
+                    <input id="stats-end-date" class="form-input" type="date" onchange="updateStatsFilters()">
+                </div>
+            </div>
+            
+        </div>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Total Revenue</div>
@@ -946,46 +996,6 @@
             </div>
         </div>
 
-        <div class="card" id="stats-filter-card">
-            <div class="card-header-row">
-                <div class="card-title">🔎 Analytics Filters</div>
-                <button class="btn-secondary stats-reset-button" type="button" onclick="clearStatsFilters()">Reset</button>
-            </div>
-            <div class="stats-filter-grid">
-                <div class="stats-filter-field">
-                    <label for="stats-venue-filter">Venue</label>
-                    <select id="stats-venue-filter" class="form-input" onchange="updateStatsFilters()">
-                        <option value="ALL">All Venues</option>
-                    </select>
-                </div>
-                <div class="stats-filter-field">
-                    <label>Date</label>
-                    <div id="stats-date-radio-group" class="stats-date-radio-group">
-                        <label class="stats-date-radio"><input type="radio" name="stats-date-mode-radio" value="ALL_TIME" onchange="selectStatsDateMode(this.value)" checked>All Time</label>
-                        <label class="stats-date-radio"><input type="radio" name="stats-date-mode-radio" value="SINGLE_DATE" onchange="selectStatsDateMode(this.value)">Individual Date</label>
-                        <label class="stats-date-radio"><input type="radio" name="stats-date-mode-radio" value="CUSTOM_RANGE" onchange="selectStatsDateMode(this.value)">Custom Range</label>
-                    </div>
-                    <input id="stats-date-mode" type="hidden" value="ALL_TIME">
-                </div>
-            </div>
-            <div id="stats-single-date-fields" class="stats-date-fields" style="display:none;">
-                <div class="stats-filter-field">
-                    <label for="stats-single-date">Select date</label>
-                    <input id="stats-single-date" class="form-input" type="date" onchange="updateStatsFilters()">
-                </div>
-            </div>
-            <div id="stats-custom-range-fields" class="stats-date-fields stats-filter-grid" style="display:none;">
-                <div class="stats-filter-field">
-                    <label for="stats-start-date">From</label>
-                    <input id="stats-start-date" class="form-input" type="date" onchange="updateStatsFilters()">
-                </div>
-                <div class="stats-filter-field">
-                    <label for="stats-end-date">To</label>
-                    <input id="stats-end-date" class="form-input" type="date" onchange="updateStatsFilters()">
-                </div>
-            </div>
-            <div id="stats-filter-summary" class="stats-filter-pills" aria-live="polite"></div>
-        </div>
         <div class="card">
             <div class="card-header-row">
                 <div class="card-title">📍 Revenue by Venue</div>
@@ -2075,7 +2085,7 @@
 
         const STATS_FILTER_KEY = 'cream_daddy_stats_filters';
         let statsFilters = {
-            venue: 'ALL',
+            selectedVenues: [],
             mode: 'ALL_TIME',
             singleDate: '',
             startDate: '',
@@ -2085,7 +2095,14 @@
         function loadStatsFilters() {
             try {
                 const stored = sessionStorage.getItem(STATS_FILTER_KEY);
-                if (stored) statsFilters = { ...statsFilters, ...JSON.parse(stored) };
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    statsFilters = { ...statsFilters, ...parsed };
+                    if (!Array.isArray(statsFilters.selectedVenues)) {
+                        statsFilters.selectedVenues = parsed.venue && parsed.venue !== 'ALL' ? [parsed.venue] : [];
+                    }
+                    delete statsFilters.venue;
+                }
             } catch (error) {
                 console.warn('Could not restore analytics filters:', error);
             }
@@ -2116,7 +2133,8 @@
 
         function getFilteredTransactions() {
             return STATE.transactions.filter(tx => {
-                const venueMatches = statsFilters.venue === 'ALL' || String(tx.venue || 'Unspecified Venue') === statsFilters.venue;
+                const txVenue = String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue';
+                const venueMatches = statsFilters.selectedVenues.length === 0 || statsFilters.selectedVenues.includes(txVenue);
                 if (!venueMatches) return false;
 
                 if (statsFilters.mode === 'ALL_TIME') return true;
@@ -2126,12 +2144,10 @@
                 if (statsFilters.mode === 'SINGLE_DATE') {
                     return Boolean(statsFilters.singleDate) && txDate === statsFilters.singleDate;
                 }
-
                 if (statsFilters.mode === 'CUSTOM_RANGE') {
                     if (!statsFilters.startDate || !statsFilters.endDate) return false;
                     return txDate >= statsFilters.startDate && txDate <= statsFilters.endDate;
                 }
-
                 return true;
             });
         }
@@ -2139,28 +2155,26 @@
         function populateStatsVenueFilter() {
             const select = document.getElementById('stats-venue-filter');
             if (!select) return;
-            const venues = [...new Set(STATE.transactions.map(tx => String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue'))]
-                .sort((a, b) => a.localeCompare(b));
-            const savedVenue = statsFilters.venue;
+
+            const venues = [...new Set(STATE.transactions.map(tx =>
+                String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue'
+            ))].sort((a, b) => a.localeCompare(b));
+
+            statsFilters.selectedVenues = statsFilters.selectedVenues.filter(venue => venues.includes(venue));
             select.innerHTML = '<option value="ALL">All Venues</option>' + venues.map(venue =>
                 `<option value="${escapeHtml(venue)}">${escapeHtml(venue)}</option>`
             ).join('');
-            statsFilters.venue = savedVenue === 'ALL' || venues.includes(savedVenue) ? savedVenue : 'ALL';
-            select.value = statsFilters.venue;
-        }
 
-        window.selectStatsDateMode = function(mode) {
-            const hidden = document.getElementById('stats-date-mode');
-            if (hidden) hidden.value = mode;
-            updateStatsFilterVisibility();
-            updateStatsFilters();
-        };
-
-        function syncStatsDateRadios() {
-            document.querySelectorAll('input[name="stats-date-mode-radio"]').forEach(radio => {
-                radio.checked = radio.value === statsFilters.mode;
+            [...select.options].forEach(option => {
+                option.selected = option.value === 'ALL'
+                    ? statsFilters.selectedVenues.length === 0
+                    : statsFilters.selectedVenues.includes(option.value);
             });
         }
+
+        
+
+        
 
         function updateStatsFilterVisibility() {
             const mode = document.getElementById('stats-date-mode')?.value || statsFilters.mode;
@@ -2172,42 +2186,31 @@
 
         function syncStatsFilterControls() {
             populateStatsVenueFilter();
-            const venue = document.getElementById('stats-venue-filter');
             const mode = document.getElementById('stats-date-mode');
             const single = document.getElementById('stats-single-date');
             const start = document.getElementById('stats-start-date');
             const end = document.getElementById('stats-end-date');
-            if (venue) venue.value = statsFilters.venue;
             if (mode) mode.value = statsFilters.mode;
             if (single) single.value = statsFilters.singleDate;
             if (start) start.value = statsFilters.startDate;
             if (end) end.value = statsFilters.endDate;
-            syncStatsDateRadios();
             updateStatsFilterVisibility();
-            updateStatsFilterSummary();
         }
 
         function updateStatsFilterSummary() {
-            const summary = document.getElementById('stats-filter-summary');
-            if (!summary) return;
-            const venueLabel = statsFilters.venue === 'ALL' ? '📍 All venues' : `📍 ${statsFilters.venue}`;
-            let dateLabel = '📅 All time';
-            if (statsFilters.mode === 'SINGLE_DATE') dateLabel = statsFilters.singleDate ? `📅 ${statsFilters.singleDate}` : '📅 Select a date';
-            if (statsFilters.mode === 'CUSTOM_RANGE') {
-                dateLabel = statsFilters.startDate && statsFilters.endDate
-                    ? `📅 ${statsFilters.startDate} to ${statsFilters.endDate}`
-                    : '📅 Select a complete range';
-            }
-            const count = getFilteredTransactions().length;
-            summary.innerHTML = `
-                <span class="stats-filter-pill">${escapeHtml(venueLabel)}</span>
-                <span class="stats-filter-pill">${escapeHtml(dateLabel)}</span>
-                <span class="stats-filter-pill">🧾 ${count} transaction${count === 1 ? '' : 's'}</span>`;
+            return;
         }
 
         window.updateStatsFilters = function() {
+            const venueSelect = document.getElementById('stats-venue-filter');
+            let selectedVenues = venueSelect
+                ? [...venueSelect.selectedOptions].map(option => option.value)
+                : [];
+
+            if (selectedVenues.includes('ALL')) selectedVenues = [];
+
             statsFilters = {
-                venue: document.getElementById('stats-venue-filter')?.value || 'ALL',
+                selectedVenues,
                 mode: document.getElementById('stats-date-mode')?.value || 'ALL_TIME',
                 singleDate: document.getElementById('stats-single-date')?.value || '',
                 startDate: document.getElementById('stats-start-date')?.value || '',
@@ -2218,7 +2221,7 @@
         };
 
         window.clearStatsFilters = function() {
-            statsFilters = { venue: 'ALL', mode: 'ALL_TIME', singleDate: '', startDate: '', endDate: '' };
+            statsFilters = { selectedVenues: [], mode: 'ALL_TIME', singleDate: '', startDate: '', endDate: '' };
             saveStatsFilters();
             syncStatsFilterControls();
             renderStats();
@@ -2274,7 +2277,6 @@ function renderVenueReport() {
 
         function renderStats() {
             populateStatsVenueFilter();
-            syncStatsDateRadios();
             updateStatsFilterVisibility();
 
             const transactions = getFilteredTransactions();
@@ -2295,7 +2297,6 @@ function renderVenueReport() {
             document.getElementById('stat-sold').textContent = totalSold;
             document.getElementById('stat-comp').textContent = totalComp;
             document.getElementById('stat-txs').textContent = transactions.length;
-            updateStatsFilterSummary();
 
             const log = document.getElementById('transactions-history-list');
             if (!log) return;
