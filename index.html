@@ -237,6 +237,13 @@
             background: #fee2e2;
             color: var(--danger);
         }
+        .flavor-stock-tag.sold-out {
+            background: var(--brand-black);
+            color: var(--brand-white);
+        }
+        .flavor-card.out-of-stock { cursor: not-allowed; }
+        .inventory-status-low { color:#b45309; font-weight:800; white-space:nowrap; }
+        .inventory-status-out { color:var(--danger); font-weight:900; white-space:nowrap; }
 
         .cart-section {
             background: var(--brand-white);
@@ -811,7 +818,7 @@
     <div id="tab-inventory" class="tab-content">
         <div class="card">
             <div class="card-header-row">
-                <div class="card-title">Pint Inventory & Menu</div>
+                <div class="card-title">Unit Inventory & Menu</div>
                 <button class="btn-primary" onclick="openModal('flavor-modal')">+ Add Flavor</button>
             </div>
             <div style="overflow-x: auto;">
@@ -851,11 +858,11 @@
                 <div class="stat-val" id="stat-revenue">$0.00</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Pints Sold</div>
+                <div class="stat-label">Units Sold</div>
                 <div class="stat-val" id="stat-sold">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Pints Free/Comp</div>
+                <div class="stat-label">Units Gifted</div>
                 <div class="stat-val" id="stat-comp">0</div>
             </div>
             <div class="stat-card">
@@ -1717,6 +1724,17 @@
             document.getElementById('display-date').textContent = STATE.date;
         }
 
+        function getInventoryStatus(remaining) {
+            const count = Math.max(0, Number(remaining) || 0);
+            if (count === 0) {
+                return { text: '🚫 SOLD OUT', className: 'sold-out', inventoryClass: 'inventory-status-out' };
+            }
+            if (count <= 3) {
+                return { text: `⚠️ ${count} Left`, className: 'low', inventoryClass: 'inventory-status-low' };
+            }
+            return { text: `${count} Left`, className: '', inventoryClass: '' };
+        }
+
         function renderRegister() {
             renderShiftBar();
 
@@ -1733,17 +1751,28 @@
                     </div>
                 `;
             } else {
-                grid.innerHTML = STATE.flavors.map(f => {
+                const sortedFlavors = STATE.flavors
+                    .map((flavor, originalIndex) => ({ flavor, originalIndex }))
+                    .sort((a, b) => {
+                        const aOut = getFlavorStockRemaining(a.flavor) <= 0 ? 1 : 0;
+                        const bOut = getFlavorStockRemaining(b.flavor) <= 0 ? 1 : 0;
+                        return aOut - bOut || a.originalIndex - b.originalIndex;
+                    })
+                    .map(entry => entry.flavor);
+
+                grid.innerHTML = sortedFlavors.map(f => {
                     const remaining = getFlavorStockRemaining(f);
                     const isOut = remaining <= 0;
+                    const status = getInventoryStatus(remaining);
+                    const clickAction = isOut ? '' : `onclick="addToCart('${f.id}')"`;
                     return `
-                        <div class="flavor-card ${isOut ? 'out-of-stock' : ''}" onclick="addToCart('${f.id}')">
+                        <div class="flavor-card ${isOut ? 'out-of-stock' : ''}" ${clickAction} aria-disabled="${isOut}">
                             <div class="flavor-img-wrapper">
                                 ${f.photo ? `<img src="${f.photo}" alt="${f.name}">` : `<span class="flavor-fallback-icon">🍦</span>`}
                             </div>
                             <div class="flavor-name">${f.name}</div>
+                            <div class="flavor-stock-tag ${status.className}">${status.text}</div>
                             <div class="flavor-price">$${f.price.toFixed(2)}</div>
-                            <div class="flavor-stock-tag ${remaining <= 3 ? 'low' : ''}">${remaining} Left</div>
                         </div>
                     `;
                 }).join('');
@@ -1810,6 +1839,7 @@
             tbody.innerHTML = STATE.flavors.map(f => {
                 const counts = getFlavorCounts(f.id);
                 const left = Math.max(0, Number(f.currentStock != null ? f.currentStock : f.startingStock) || 0);
+                const inventoryStatus = getInventoryStatus(left);
                 return `
                     <tr>
                         <td>
@@ -1822,7 +1852,7 @@
                         <td><strong>${f.startingStock}</strong></td>
                         <td style="color:var(--brand-pink); font-weight:700;">${counts.sold}</td>
                         <td style="color:var(--brand-gold); font-weight:700;">${counts.comp}</td>
-                        <td><strong style="${left <= 3 ? 'color:var(--danger);' : ''}">${left}</strong></td>
+                        <td><span class="${inventoryStatus.inventoryClass}">${inventoryStatus.text}</span></td>
                         <td>
                             <button class="btn-edit-outline" onclick="openEditFlavor('${f.id}')">✏️ Edit</button>
                             <button class="btn-danger-outline" onclick="deleteFlavor('${f.id}')">🗑️</button>
@@ -1954,8 +1984,8 @@
             docText += `Venue: ${STATE.venue}\nDate: ${STATE.date}\n`;
             docText += `----------------------------------------\n`;
             docText += `Gross Sales: $${rev.toFixed(2)}\n`;
-            docText += `Paid Pints Sold: ${sold}\n`;
-            docText += `Free / Promotional Pints: ${comp}\n`;
+            docText += `Paid Units Sold: ${sold}\n`;
+            docText += `Free / Promotional Units: ${comp}\n`;
             docText += `Total Containers Out: ${sold + comp}\n\n`;
             docText += `INVENTORY BREAKDOWN:\n`;
             STATE.flavors.forEach(f => {
