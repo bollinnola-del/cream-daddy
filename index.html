@@ -687,6 +687,14 @@
         .access-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 14px; }
         #helper-access-code { width: 100%; font-size: 18px; text-align: center; margin-bottom: 10px; }
         #access-error { min-height: 20px; color: var(--danger); font-size: 13px; margin-top: 8px; }
+
+        .venue-report-row { margin-bottom: 16px; }
+        .venue-report-heading { display:flex; justify-content:space-between; gap:12px; align-items:baseline; }
+        .venue-report-name { font-size:14px; font-weight:800; color:var(--brand-black); }
+        .venue-report-revenue { font-size:14px; font-weight:900; color:var(--brand-pink); white-space:nowrap; }
+        .venue-report-meta { font-size:11px; color:var(--text-muted); margin:3px 0 6px; }
+        .venue-report-track { height:12px; background:#f3f4f6; border-radius:999px; overflow:hidden; }
+        .venue-report-fill { height:100%; min-width:0; background:linear-gradient(90deg,var(--brand-pink),var(--brand-gold)); border-radius:999px; }
     </style>
 </head>
 
@@ -865,6 +873,13 @@
             </div>
         </div>
 
+        <div class="card">
+            <div class="card-header-row">
+                <div class="card-title">📍 Revenue by Venue</div>
+                <span style="font-size:11px;color:var(--text-muted);">Highest revenue first</span>
+            </div>
+            <div id="venue-performance-list"></div>
+        </div>
         <div class="card">
             <div class="card-title" style="margin-bottom: 10px;">📜 Shift Receipt Log</div>
             <div id="transactions-history-list"></div>
@@ -1838,7 +1853,56 @@
             alert('✅ Cooler pack inventory updated & synced to Sheet!');
         };
 
+        function renderVenueReport() {
+            const container = document.getElementById('venue-performance-list');
+            if (!container) return;
+
+            const venues = {};
+            STATE.transactions.forEach(tx => {
+                const venue = String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue';
+                if (!venues[venue]) {
+                    venues[venue] = { revenue: 0, sold: 0, gifted: 0, transactions: 0 };
+                }
+                venues[venue].revenue += Number(tx.totalPrice) || 0;
+                venues[venue].sold += Number(tx.totalUnitsSold) || 0;
+                venues[venue].gifted += Number(tx.totalUnitsGiven) || 0;
+                venues[venue].transactions += 1;
+            });
+
+            const rows = Object.entries(venues)
+                .map(([venue, values]) => ({ venue, ...values }))
+                .sort((a, b) => b.revenue - a.revenue || a.venue.localeCompare(b.venue));
+
+            if (!rows.length) {
+                container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:12px;">No venue sales have been recorded yet.</div>';
+                return;
+            }
+
+            const maxRevenue = Math.max(...rows.map(row => row.revenue), 1);
+            container.innerHTML = rows.map(row => {
+                const width = row.revenue > 0 ? Math.max(2, (row.revenue / maxRevenue) * 100) : 0;
+                return `
+                    <div class="venue-report-row">
+                        <div class="venue-report-heading">
+                            <span class="venue-report-name">${escapeHtml(row.venue)}</span>
+                            <span class="venue-report-revenue">$${row.revenue.toFixed(2)}</span>
+                        </div>
+                        <div class="venue-report-meta">
+                            ${row.transactions} transaction${row.transactions === 1 ? '' : 's'} · ${row.sold} sold · ${row.gifted} gifted
+                        </div>
+                        <div class="venue-report-track"><div class="venue-report-fill" style="width:${width}%"></div></div>
+                    </div>`;
+            }).join('');
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            })[char]);
+        }
+
         function renderStats() {
+            renderVenueReport();
             let totalRevenue = 0;
             let totalSold = 0;
             let totalComp = 0;
