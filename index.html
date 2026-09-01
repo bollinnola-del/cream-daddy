@@ -796,7 +796,7 @@
         <div class="access-card">
             <div style="font-size:42px;margin-bottom:8px;">🍦</div>
             <h1>Cream Daddy Team Access</h1>
-            <p>Enter the helper access code. This device stays unlocked for 24 hours.</p>
+            <p>Enter the helper access code. This device stays unlocked for 4 hours.</p>
             <input id="helper-access-code" class="form-input" type="password" autocomplete="current-password" placeholder="Access code">
             <button id="unlock-register" class="btn-primary" style="width:100%;padding:12px;" onclick="authorizeHelper()">Unlock Register</button>
             <div id="access-error" role="alert"></div>
@@ -1008,6 +1008,15 @@
                 <span style="font-size:11px;color:var(--text-muted);">Highest revenue first</span>
             </div>
             <div id="venue-performance-list"></div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-header-row">
+                <div class="card-title">🍦 Revenue by Product</div>
+                <span style="font-size:11px;color:var(--text-muted);">Highest revenue first</span>
+            </div>
+            <div id="product-performance-list"></div>
         </div>
         <div class="card">
             <div class="card-title" style="margin-bottom: 10px;">📜 Shift Receipt Log</div>
@@ -2230,7 +2239,6 @@
             syncStatsFilterControls();
             renderStats();
         };
-
 function renderVenueReport() {
             const container = document.getElementById('venue-performance-list');
             if (!container) return;
@@ -2281,6 +2289,7 @@ function renderVenueReport() {
 
         function renderStats() {
             renderVenueReport();
+            renderProductReport();
             let totalRevenue = 0;
             let totalSold = 0;
             let totalComp = 0;
