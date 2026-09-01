@@ -95,7 +95,7 @@
             align-items: center;
             font-size: 13px;
             font-weight: 700;
-            
+
         }
 
         .shift-bar button {
@@ -236,13 +236,27 @@
             background: #fee2e2;
             color: var(--danger);
         }
+
         .flavor-stock-tag.sold-out {
             background: var(--brand-black);
             color: var(--brand-white);
         }
-        .flavor-card.out-of-stock { cursor: not-allowed; }
-        .inventory-status-low { color:#b45309; font-weight:800; white-space:nowrap; }
-        .inventory-status-out { color:var(--danger); font-weight:900; white-space:nowrap; }
+
+        .flavor-card.out-of-stock {
+            cursor: not-allowed;
+        }
+
+        .inventory-status-low {
+            color: #b45309;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .inventory-status-out {
+            color: var(--danger);
+            font-weight: 900;
+            white-space: nowrap;
+        }
 
         .cart-section {
             background: var(--brand-white);
@@ -531,7 +545,6 @@
             height: 32px;
             border-radius: 6px;
             object-fit: cover;
-            border: 1px solid var(--brand-gold);
         }
 
         .stats-grid {
@@ -692,37 +705,126 @@
             padding: 20px;
             background: var(--brand-black);
         }
-        #access-lock.active { display: flex; }
-        .access-card { width: min(420px, 100%); background: #fff; border-radius: 16px; padding: 22px; text-align: center; }
-        .access-card h1 { font-size: 22px; margin-bottom: 8px; }
-        .access-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 14px; }
-        #helper-access-code { width: 100%; font-size: 18px; text-align: center; margin-bottom: 10px; }
-        #access-error { min-height: 20px; color: var(--danger); font-size: 13px; margin-top: 8px; }
 
-        .venue-report-row { margin-bottom: 16px; }
-        .venue-report-heading { display:flex; justify-content:space-between; gap:12px; align-items:baseline; }
-        .venue-report-name { font-size:14px; font-weight:800; color:var(--brand-black); }
-        .venue-report-revenue { font-size:14px; font-weight:900; color:var(--brand-pink); white-space:nowrap; }
-        .venue-report-meta { font-size:11px; color:var(--text-muted); margin:3px 0 6px; }
-        .venue-report-track { height:12px; background:#f3f4f6; border-radius:999px; overflow:hidden; }
-        .venue-report-fill { height:100%; min-width:0; background:linear-gradient(90deg,var(--brand-pink),var(--brand-gold)); border-radius:999px; }
+        #access-lock.active {
+            display: flex;
+        }
+
+        .access-card {
+            width: min(420px, 100%);
+            background: #fff;
+            border-radius: 16px;
+            padding: 22px;
+            text-align: center;
+        }
+
+        .access-card h1 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .access-card p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        #helper-access-code {
+            width: 100%;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        #access-error {
+            min-height: 20px;
+            color: var(--danger);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .venue-report-row {
+            margin-bottom: 16px;
+        }
+
+        .venue-report-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .venue-report-name {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--brand-black);
+        }
+
+        .venue-report-revenue {
+            font-size: 14px;
+            font-weight: 900;
+            color: var(--brand-pink);
+            white-space: nowrap;
+        }
+
+        .venue-report-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin: 3px 0 6px;
+        }
+
+        .venue-report-track {
+            margin-top: 10px;
+            height: 12px;
+            background: #f3f4f6;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .venue-report-fill {
+            height: 100%;
+            min-width: 0;
+            background: linear-gradient(90deg, var(--brand-pink), var(--brand-gold));
+            border-radius: 999px;
+        }
 
         .product-report-title {
             display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 0;
         }
+
+        .product-report-metrics {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            text-align: right;
+            min-height: 32px;
+        }
+
+        .product-report-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 0;
+            line-height: 1.1;
+        }
+
         .product-report-thumb,
         .product-report-fallback {
             width: 32px;
             height: 32px;
             border-radius: 8px;
             flex: 0 0 32px;
-            border: 1px solid var(--brand-gold);
         }
+
         .product-report-thumb {
             display: block;
             object-fit: cover;
             background: #f3f4f6;
         }
+
         .product-report-fallback {
             display: flex;
             align-items: center;
@@ -730,21 +832,61 @@
             background: #f3f4f6;
             font-size: 18px;
         }
+
         .product-report-title .venue-report-name {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        .stats-filter-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-        .stats-filter-field { display:flex; flex-direction:column; gap:5px; }
-        .stats-filter-field label { font-size:11px; font-weight:800; color:var(--text-muted); }
+        .stats-filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stats-filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .stats-filter-field label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+        }
+
         .stats-filter-field select,
-        .stats-filter-field input { width:100%; min-height:42px; }
-        .stats-date-fields { margin-top:10px; }
-        .stats-filter-summary { margin-top:10px; padding:9px 10px; background:#f9fafb; border-radius:8px; font-size:12px; color:var(--text-muted); }
-        .stats-filter-actions { display:flex; justify-content:flex-end; margin-top:10px; }
-        @media (max-width:560px) { .stats-filter-grid { grid-template-columns:1fr; } }
+        .stats-filter-field input {
+            width: 100%;
+            min-height: 42px;
+        }
+
+        .stats-date-fields {
+            margin-top: 10px;
+        }
+
+        .stats-filter-summary {
+            margin-top: 10px;
+            padding: 9px 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .stats-filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        @media (max-width:560px) {
+            .stats-filter-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
         /* Stats UI v3.2 */
         #tab-stats .stats-grid,
@@ -752,42 +894,121 @@
             grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
             gap: 10px;
         }
-        #stats-filter-card .card-header-row { align-items:center; margin-bottom:10px; }
-        .stats-reset-button { padding:7px 12px; border-radius:999px; font-size:12px; }
-        .stats-date-radio-group { display:flex; flex-wrap:wrap; gap:8px; }
+
+        #stats-filter-card .card-header-row {
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .stats-reset-button {
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+        }
+
+        .stats-date-radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
         .stats-date-radio {
-            display:inline-flex; align-items:center; gap:6px; min-height:38px;
-            padding:7px 10px; border:1px solid var(--border-color); border-radius:999px;
-            background:#fff; font-size:12px; font-weight:700; cursor:pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 38px;
+            padding: 7px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            background: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
         }
+
         .stats-date-radio:has(input:checked) {
-            border-color:var(--brand-pink); background:#fff0f7; color:var(--brand-pink);
+            border-color: var(--brand-pink);
+            background: #fff0f7;
+            color: var(--brand-pink);
         }
-        .stats-date-radio input { width:auto; min-height:0; margin:0; accent-color:var(--brand-pink); }
-        .stats-filter-pills { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+
+        .stats-date-radio input {
+            width: auto;
+            min-height: 0;
+            margin: 0;
+            accent-color: var(--brand-pink);
+        }
+
+        .stats-filter-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 10px;
+        }
+
         .stats-filter-pill {
-            display:inline-flex; align-items:center; min-height:28px; padding:5px 10px;
-            border-radius:999px; background:#f3f4f6; color:var(--text-muted);
-            font-size:11px; font-weight:800;
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: #f3f4f6;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 800;
         }
+
         @media (max-width:560px) {
+
             #tab-stats .stats-grid,
-            #tab-stats .stats-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap:6px; }
-            #tab-stats .stat-card { padding:10px 4px !important; min-width:0; }
-            #tab-stats .stat-label { font-size:9px !important; }
-            #tab-stats .stat-value { font-size:18px !important; }
-            .stats-date-radio-group { display:grid; grid-template-columns:1fr; }
+            #tab-stats .stats-summary-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+                gap: 6px;
+            }
+
+            #tab-stats .stat-card {
+                padding: 10px 4px !important;
+                min-width: 0;
+            }
+
+            #tab-stats .stat-label {
+                font-size: 9px !important;
+            }
+
+            #tab-stats .stat-value {
+                font-size: 18px !important;
+            }
+
+            .stats-date-radio-group {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Stats UI V3.3.2 */
         .stats-venue-multiselect {
-            width: 100%; min-height: 118px; padding: 6px;
-            border: 1px solid var(--border-color); border-radius: 8px;
-            background: #fff; font: inherit;
+            width: 100%;
+            min-height: 118px;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #fff;
+            font: inherit;
         }
-        .stats-venue-multiselect option { padding: 7px 8px; }
-        .stats-filter-helper { margin-top: 4px; font-size: 10px; color: var(--text-muted); }
-        #stats-date-mode { min-height: 42px; }
+
+        .stats-venue-multiselect option {
+            padding: 7px 8px;
+        }
+
+        .stats-filter-helper {
+            margin-top: 4px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        #stats-date-mode {
+            min-height: 42px;
+        }
     </style>
 </head>
 
@@ -797,15 +1018,16 @@
             <div style="font-size:42px;margin-bottom:8px;">🍦</div>
             <h1>Cream Daddy Team Access</h1>
             <p>Enter the helper access code. This device stays unlocked for 4 hours.</p>
-            <input id="helper-access-code" class="form-input" type="password" autocomplete="current-password" placeholder="Access code">
-            <button id="unlock-register" class="btn-primary" style="width:100%;padding:12px;" onclick="authorizeHelper()">Unlock Register</button>
+            <input id="helper-access-code" class="form-input" type="password" autocomplete="current-password"
+                placeholder="Access code">
+            <button id="unlock-register" class="btn-primary" style="width:100%;padding:12px;"
+                onclick="authorizeHelper()">Unlock Register</button>
             <div id="access-error" role="alert"></div>
         </div>
     </div>
     <header>
         <div class="logo-container">
-            <img src="assets/cream-daddy-banner.png"
-                alt="Cream Daddy Logo" class="brand-logo-img"
+            <img src="assets/cream-daddy-banner.png" alt="Cream Daddy Logo" class="brand-logo-img"
                 onerror="this.outerHTML='<h2 style=\'color:var(--brand-pink);\'>CREAM DADDY</h2>'">
         </div>
         <div class="header-actions">
@@ -937,19 +1159,23 @@
         <div class="card" id="stats-filter-card">
             <div class="card-header-row">
                 <div class="card-title">🔎 Analytics Filters</div>
-                <button class="btn-secondary stats-reset-button" type="button" onclick="clearStatsFilters()">Reset</button>
+                <button class="btn-secondary stats-reset-button" type="button"
+                    onclick="clearStatsFilters()">Reset</button>
             </div>
             <div class="stats-filter-grid">
                 <div class="stats-filter-field">
                     <label for="stats-venue-filter">Venue</label>
-                    <select id="stats-venue-filter" class="stats-venue-multiselect" multiple size="4" onchange="updateStatsFilters()">
+                    <select id="stats-venue-filter" class="stats-venue-multiselect" multiple size="4"
+                        onchange="updateStatsFilters()">
                         <option value="ALL">All Venues</option>
                     </select>
-                    <div class="stats-filter-helper">Select one or more venues. Select All Venues to clear venue-specific filtering.</div>
+                    <div class="stats-filter-helper">Select one or more venues. Select All Venues to clear
+                        venue-specific filtering.</div>
                 </div>
                 <div class="stats-filter-field">
                     <label for="stats-date-mode">Date</label>
-                    <select id="stats-date-mode" class="form-input" onchange="updateStatsFilterVisibility(); updateStatsFilters();">
+                    <select id="stats-date-mode" class="form-input"
+                        onchange="updateStatsFilterVisibility(); updateStatsFilters();">
                         <option value="ALL_TIME">All Time</option>
                         <option value="SINGLE_DATE">Individual Date</option>
                         <option value="CUSTOM_RANGE">Custom Range</option>
@@ -972,7 +1198,7 @@
                     <input id="stats-end-date" class="form-input" type="date" onchange="updateStatsFilters()">
                 </div>
             </div>
-            
+
         </div>
         <div class="stats-grid">
             <div class="stat-card">
@@ -994,15 +1220,6 @@
         </div>
 
         <div class="card">
-            <div class="card-title" style="margin-bottom: 10px;">📄 Export Shift Data</div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn-primary" style="flex:1;" onclick="copyGoogleDocSummary()">📋 Copy for Google
-                    Docs</button>
-                <button class="btn-gold" style="flex:1;" onclick="exportCSV()">📊 Export CSV (Sheets)</button>
-            </div>
-        </div>
-
-        <div class="card">
             <div class="card-header-row">
                 <div class="card-title">📍 Revenue by Venue</div>
                 <span style="font-size:11px;color:var(--text-muted);">Highest revenue first</span>
@@ -1010,10 +1227,9 @@
             <div id="venue-performance-list"></div>
         </div>
 
-
         <div class="card">
             <div class="card-header-row">
-                <div class="card-title">🍦 Revenue by Product</div>
+                <div class="card-title">📦 Revenue by Product</div>
                 <span style="font-size:11px;color:var(--text-muted);">Highest revenue first</span>
             </div>
             <div id="product-performance-list"></div>
@@ -1992,7 +2208,7 @@
                         <td style="color:var(--brand-gold); font-weight:700;">${counts.comp}</td>
                         <td><strong style="${left <= 3 ? 'color:var(--danger);' : ''}">${left}</strong></td>
                         <td>
-                            <button class="btn-edit-outline" onclick="openEditFlavor('${f.id}')">✏️ Edit</button>
+                            <button class="btn-edit-outline" onclick="openEditFlavor('${f.id}')">✏️</button>
                             <button class="btn-danger-outline" onclick="deleteFlavor('${f.id}')">🗑️</button>
                         </td>
                     </tr>
@@ -2021,7 +2237,7 @@
             alert('✅ Cooler pack inventory updated & synced to Sheet!');
         };
 
-        
+
         function renderProductReport() {
             const container = document.getElementById('product-performance-list');
             if (!container) return;
@@ -2078,16 +2294,22 @@
 
                 return `
                     <div class="venue-report-row">
-                        <div class="venue-report-heading">
-                            <div class="product-report-title">
-                                ${imageHtml}
-                                <span class="venue-report-name">${escapeHtml(row.name)}</span>
-                            </div>
-                            <span class="venue-report-revenue">$${row.revenue.toFixed(2)}</span>
-                        </div>
-                        <div class="venue-report-meta">
-                            ${row.sold} sold · ${row.gifted} gifted
-                        </div>
+<div class="venue-report-heading">
+    <div class="product-report-title">
+        ${imageHtml}
+        <span class="venue-report-name">${escapeHtml(row.name)}</span>
+    </div>
+
+    <div class="product-report-metrics">
+        <div class="venue-report-revenue">
+            $${row.revenue.toFixed(2)}
+        </div>
+
+        <div class="product-report-meta">
+            ${row.sold} sold · ${row.gifted} gifted
+        </div>
+    </div>
+</div>
                         <div class="venue-report-track">
                             <div class="venue-report-fill" style="width:${width}%"></div>
                         </div>
@@ -2185,9 +2407,9 @@
             });
         }
 
-        
 
-        
+
+
 
         function updateStatsFilterVisibility() {
             const mode = document.getElementById('stats-date-mode')?.value || statsFilters.mode;
@@ -2214,7 +2436,7 @@
             return;
         }
 
-        window.updateStatsFilters = function() {
+        window.updateStatsFilters = function () {
             const venueSelect = document.getElementById('stats-venue-filter');
             let selectedVenues = venueSelect
                 ? [...venueSelect.selectedOptions].map(option => option.value)
@@ -2233,13 +2455,13 @@
             renderStats();
         };
 
-        window.clearStatsFilters = function() {
+        window.clearStatsFilters = function () {
             statsFilters = { selectedVenues: [], mode: 'ALL_TIME', singleDate: '', startDate: '', endDate: '' };
             saveStatsFilters();
             syncStatsFilterControls();
             renderStats();
         };
-function renderVenueReport() {
+        function renderVenueReport() {
             const container = document.getElementById('venue-performance-list');
             if (!container) return;
 
@@ -2513,7 +2735,7 @@ function renderVenueReport() {
         const tabVisibilityObserver = new MutationObserver(updateRegisterVenueBarVisibility);
         window.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.tab-content').forEach(tab =>
-                tabVisibilityObserver.observe(tab, { attributes:true, attributeFilter:['class'] })
+                tabVisibilityObserver.observe(tab, { attributes: true, attributeFilter: ['class'] })
             );
             updateRegisterVenueBarVisibility();
         });
