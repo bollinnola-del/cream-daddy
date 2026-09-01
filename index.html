@@ -17,9 +17,9 @@
             --brand-gold: #fabc15;
             --brand-black: #111111;
             --brand-white: #ffffff;
-            --bg-body: #f8f9fa;
+            --bg-body: #f9c842;
             --card-bg: #ffffff;
-            --border-color: #e5e7eb;
+            --border-color: #e37cb3;
             --text-dark: #1f2937;
             --text-muted: #6b7280;
             --danger: #ef4444;
@@ -42,7 +42,7 @@
         }
 
         header {
-            background-color: var(--brand-black);
+            background-color: var(--brand-gold);
             color: var(--brand-white);
             padding: 10px 16px;
             display: flex;
@@ -64,9 +64,7 @@
             height: 38px;
             max-width: 140px;
             object-fit: contain;
-            border-radius: 6px;
-            background: #fff;
-            padding: 2px 4px;
+            background: transparent;
         }
 
         .header-actions {
@@ -89,7 +87,7 @@
         }
 
         .shift-bar {
-            background-color: var(--brand-gold);
+            background-color: var(--brand-pink);
             color: var(--brand-black);
             padding: 8px 16px;
             display: flex;
@@ -97,6 +95,7 @@
             align-items: center;
             font-size: 13px;
             font-weight: 700;
+            
         }
 
         .shift-bar button {
@@ -237,10 +236,17 @@
             background: #fee2e2;
             color: var(--danger);
         }
+        .flavor-stock-tag.sold-out {
+            background: var(--brand-black);
+            color: var(--brand-white);
+        }
+        .flavor-card.out-of-stock { cursor: not-allowed; }
+        .inventory-status-low { color:#b45309; font-weight:800; white-space:nowrap; }
+        .inventory-status-out { color:var(--danger); font-weight:900; white-space:nowrap; }
 
         .cart-section {
             background: var(--brand-white);
-            border: 2px solid var(--brand-black);
+            border: 2px solid var(--brand-pink);
             border-radius: 14px;
             padding: 14px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
@@ -686,87 +692,102 @@
             padding: 20px;
             background: var(--brand-black);
         }
+        #access-lock.active { display: flex; }
+        .access-card { width: min(420px, 100%); background: #fff; border-radius: 16px; padding: 22px; text-align: center; }
+        .access-card h1 { font-size: 22px; margin-bottom: 8px; }
+        .access-card p { color: var(--text-muted); font-size: 13px; margin-bottom: 14px; }
+        #helper-access-code { width: 100%; font-size: 18px; text-align: center; margin-bottom: 10px; }
+        #access-error { min-height: 20px; color: var(--danger); font-size: 13px; margin-top: 8px; }
 
-        #access-lock.active {
+        .venue-report-row { margin-bottom: 16px; }
+        .venue-report-heading { display:flex; justify-content:space-between; gap:12px; align-items:baseline; }
+        .venue-report-name { font-size:14px; font-weight:800; color:var(--brand-black); }
+        .venue-report-revenue { font-size:14px; font-weight:900; color:var(--brand-pink); white-space:nowrap; }
+        .venue-report-meta { font-size:11px; color:var(--text-muted); margin:3px 0 6px; }
+        .venue-report-track { height:12px; background:#f3f4f6; border-radius:999px; overflow:hidden; }
+        .venue-report-fill { height:100%; min-width:0; background:linear-gradient(90deg,var(--brand-pink),var(--brand-gold)); border-radius:999px; }
+
+        .product-report-title {
             display: flex;
         }
-
-        .access-card {
-            width: min(420px, 100%);
-            background: #fff;
-            border-radius: 16px;
-            padding: 22px;
-            text-align: center;
+        .product-report-thumb,
+        .product-report-fallback {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            flex: 0 0 32px;
+            border: 1px solid var(--brand-gold);
         }
-
-        .access-card h1 {
-            font-size: 22px;
-            margin-bottom: 8px;
+        .product-report-thumb {
+            display: block;
+            object-fit: cover;
+            background: #f3f4f6;
         }
-
-        .access-card p {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 14px;
-        }
-
-        #helper-access-code {
-            width: 100%;
+        .product-report-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
             font-size: 18px;
-            text-align: center;
-            margin-bottom: 10px;
         }
-
-        #access-error {
-            min-height: 20px;
-            color: var(--danger);
-            font-size: 13px;
-            margin-top: 8px;
-        }
-
-        .venue-report-row {
-            margin-bottom: 16px;
-        }
-
-        .venue-report-heading {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: baseline;
-        }
-
-        .venue-report-name {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--brand-black);
-        }
-
-        .venue-report-revenue {
-            font-size: 14px;
-            font-weight: 900;
-            color: var(--brand-pink);
+        .product-report-title .venue-report-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        .venue-report-meta {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin: 3px 0 6px;
+        .stats-filter-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .stats-filter-field { display:flex; flex-direction:column; gap:5px; }
+        .stats-filter-field label { font-size:11px; font-weight:800; color:var(--text-muted); }
+        .stats-filter-field select,
+        .stats-filter-field input { width:100%; min-height:42px; }
+        .stats-date-fields { margin-top:10px; }
+        .stats-filter-summary { margin-top:10px; padding:9px 10px; background:#f9fafb; border-radius:8px; font-size:12px; color:var(--text-muted); }
+        .stats-filter-actions { display:flex; justify-content:flex-end; margin-top:10px; }
+        @media (max-width:560px) { .stats-filter-grid { grid-template-columns:1fr; } }
+
+        /* Stats UI v3.2 */
+        #tab-stats .stats-grid,
+        #tab-stats .stats-summary-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: 10px;
+        }
+        #stats-filter-card .card-header-row { align-items:center; margin-bottom:10px; }
+        .stats-reset-button { padding:7px 12px; border-radius:999px; font-size:12px; }
+        .stats-date-radio-group { display:flex; flex-wrap:wrap; gap:8px; }
+        .stats-date-radio {
+            display:inline-flex; align-items:center; gap:6px; min-height:38px;
+            padding:7px 10px; border:1px solid var(--border-color); border-radius:999px;
+            background:#fff; font-size:12px; font-weight:700; cursor:pointer;
+        }
+        .stats-date-radio:has(input:checked) {
+            border-color:var(--brand-pink); background:#fff0f7; color:var(--brand-pink);
+        }
+        .stats-date-radio input { width:auto; min-height:0; margin:0; accent-color:var(--brand-pink); }
+        .stats-filter-pills { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+        .stats-filter-pill {
+            display:inline-flex; align-items:center; min-height:28px; padding:5px 10px;
+            border-radius:999px; background:#f3f4f6; color:var(--text-muted);
+            font-size:11px; font-weight:800;
+        }
+        @media (max-width:560px) {
+            #tab-stats .stats-grid,
+            #tab-stats .stats-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap:6px; }
+            #tab-stats .stat-card { padding:10px 4px !important; min-width:0; }
+            #tab-stats .stat-label { font-size:9px !important; }
+            #tab-stats .stat-value { font-size:18px !important; }
+            .stats-date-radio-group { display:grid; grid-template-columns:1fr; }
         }
 
-        .venue-report-track {
-            height: 12px;
-            background: #f3f4f6;
-            border-radius: 999px;
-            overflow: hidden;
+        /* Stats UI V3.3.2 */
+        .stats-venue-multiselect {
+            width: 100%; min-height: 118px; padding: 6px;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            background: #fff; font: inherit;
         }
-
-        .venue-report-fill {
-            height: 100%;
-            min-width: 0;
-            background: linear-gradient(90deg, var(--brand-pink), var(--brand-gold));
-            border-radius: 999px;
-        }
+        .stats-venue-multiselect option { padding: 7px 8px; }
+        .stats-filter-helper { margin-top: 4px; font-size: 10px; color: var(--text-muted); }
+        #stats-date-mode { min-height: 42px; }
     </style>
 </head>
 
@@ -775,19 +796,17 @@
         <div class="access-card">
             <div style="font-size:42px;margin-bottom:8px;">🍦</div>
             <h1>Cream Daddy Team Access</h1>
-            <p>Enter the helper access code. This device stays unlocked for 4 hours.</p>
-            <input id="helper-access-code" class="form-input" type="password" autocomplete="current-password"
-                placeholder="Access code">
-            <button id="unlock-register" class="btn-primary" style="width:100%;padding:12px;"
-                onclick="authorizeHelper()">Unlock Register</button>
+            <p>Enter the helper access code. This device stays unlocked for 24 hours.</p>
+            <input id="helper-access-code" class="form-input" type="password" autocomplete="current-password" placeholder="Access code">
+            <button id="unlock-register" class="btn-primary" style="width:100%;padding:12px;" onclick="authorizeHelper()">Unlock Register</button>
             <div id="access-error" role="alert"></div>
         </div>
     </div>
     <header>
         <div class="logo-container">
-            <img src="https://davita-production-be.glean.com/api/v1/downloadchatfile/4659584f359c48b1ac757568b33b6401"
+            <img src="assets/cream-daddy-banner.png"
                 alt="Cream Daddy Logo" class="brand-logo-img"
-                onerror="this.outerHTML='<h2 style=\'color:var(--brand-pink);\'>🍦 CREAM DADDY</h2>'">
+                onerror="this.outerHTML='<h2 style=\'color:var(--brand-pink);\'>CREAM DADDY</h2>'">
         </div>
         <div class="header-actions">
             <button class="btn-header-sync" onclick="openModal('sync-modal')">☁️ Cloud Sync</button>
@@ -915,6 +934,46 @@
     </div>
 
     <div id="tab-stats" class="tab-content">
+        <div class="card" id="stats-filter-card">
+            <div class="card-header-row">
+                <div class="card-title">🔎 Analytics Filters</div>
+                <button class="btn-secondary stats-reset-button" type="button" onclick="clearStatsFilters()">Reset</button>
+            </div>
+            <div class="stats-filter-grid">
+                <div class="stats-filter-field">
+                    <label for="stats-venue-filter">Venue</label>
+                    <select id="stats-venue-filter" class="stats-venue-multiselect" multiple size="4" onchange="updateStatsFilters()">
+                        <option value="ALL">All Venues</option>
+                    </select>
+                    <div class="stats-filter-helper">Select one or more venues. Select All Venues to clear venue-specific filtering.</div>
+                </div>
+                <div class="stats-filter-field">
+                    <label for="stats-date-mode">Date</label>
+                    <select id="stats-date-mode" class="form-input" onchange="updateStatsFilterVisibility(); updateStatsFilters();">
+                        <option value="ALL_TIME">All Time</option>
+                        <option value="SINGLE_DATE">Individual Date</option>
+                        <option value="CUSTOM_RANGE">Custom Range</option>
+                    </select>
+                </div>
+            </div>
+            <div id="stats-single-date-fields" class="stats-date-fields" style="display:none;">
+                <div class="stats-filter-field">
+                    <label for="stats-single-date">Select date</label>
+                    <input id="stats-single-date" class="form-input" type="date" onchange="updateStatsFilters()">
+                </div>
+            </div>
+            <div id="stats-custom-range-fields" class="stats-date-fields stats-filter-grid" style="display:none;">
+                <div class="stats-filter-field">
+                    <label for="stats-start-date">From</label>
+                    <input id="stats-start-date" class="form-input" type="date" onchange="updateStatsFilters()">
+                </div>
+                <div class="stats-filter-field">
+                    <label for="stats-end-date">To</label>
+                    <input id="stats-end-date" class="form-input" type="date" onchange="updateStatsFilters()">
+                </div>
+            </div>
+            
+        </div>
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Total Revenue</div>
@@ -1953,7 +2012,226 @@
             alert('✅ Cooler pack inventory updated & synced to Sheet!');
         };
 
-        function renderVenueReport() {
+        
+        function renderProductReport() {
+            const container = document.getElementById('product-performance-list');
+            if (!container) return;
+
+            const products = {};
+
+            getFilteredTransactions().forEach(tx => {
+                (tx.items || []).forEach(item => {
+                    const name = String(item.name || 'Unknown Product').trim();
+
+                    if (!products[name]) {
+                        products[name] = {
+                            revenue: 0,
+                            sold: 0,
+                            gifted: 0
+                        };
+                    }
+
+                    const qty = Number(item.qty) || 0;
+                    const price = Number(item.price) || 0;
+
+                    if (item.isComp) {
+                        products[name].gifted += qty;
+                    } else {
+                        products[name].sold += qty;
+                        products[name].revenue += qty * price;
+                    }
+                });
+            });
+
+            const rows = Object.entries(products)
+                .map(([name, values]) => ({ name, ...values }))
+                .sort((a, b) => b.revenue - a.revenue || a.name.localeCompare(b.name));
+
+            if (!rows.length) {
+                container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:12px;">No product sales have been recorded yet.</div>';
+                return;
+            }
+
+            const maxRevenue = Math.max(...rows.map(row => row.revenue), 1);
+
+            container.innerHTML = rows.map(row => {
+                const width = row.revenue > 0
+                    ? Math.max(2, (row.revenue / maxRevenue) * 100)
+                    : 0;
+
+                const catalogProduct = STATE.flavors.find(flavor =>
+                    String(flavor.name || '').trim().toLowerCase() === row.name.toLowerCase()
+                );
+
+                const imageHtml = catalogProduct && catalogProduct.photo
+                    ? `<img class="product-report-thumb" src="${escapeHtml(catalogProduct.photo)}" alt="">`
+                    : '<div class="product-report-fallback" aria-hidden="true">🍦</div>';
+
+                return `
+                    <div class="venue-report-row">
+                        <div class="venue-report-heading">
+                            <div class="product-report-title">
+                                ${imageHtml}
+                                <span class="venue-report-name">${escapeHtml(row.name)}</span>
+                            </div>
+                            <span class="venue-report-revenue">$${row.revenue.toFixed(2)}</span>
+                        </div>
+                        <div class="venue-report-meta">
+                            ${row.sold} sold · ${row.gifted} gifted
+                        </div>
+                        <div class="venue-report-track">
+                            <div class="venue-report-fill" style="width:${width}%"></div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+
+        const STATS_FILTER_KEY = 'cream_daddy_stats_filters';
+        let statsFilters = {
+            selectedVenues: [],
+            mode: 'ALL_TIME',
+            singleDate: '',
+            startDate: '',
+            endDate: ''
+        };
+
+        function loadStatsFilters() {
+            try {
+                const stored = sessionStorage.getItem(STATS_FILTER_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    statsFilters = { ...statsFilters, ...parsed };
+                    if (!Array.isArray(statsFilters.selectedVenues)) {
+                        statsFilters.selectedVenues = parsed.venue && parsed.venue !== 'ALL' ? [parsed.venue] : [];
+                    }
+                    delete statsFilters.venue;
+                }
+            } catch (error) {
+                console.warn('Could not restore analytics filters:', error);
+            }
+        }
+
+        function saveStatsFilters() {
+            sessionStorage.setItem(STATS_FILTER_KEY, JSON.stringify(statsFilters));
+        }
+
+        function transactionDateKey(tx) {
+            const rawDate = String(tx.date || '').trim();
+            const isoMatch = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (isoMatch) return `${isoMatch[1]}-${isoMatch[2]}-${isoMatch[3]}`;
+
+            const slashMatch = rawDate.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (slashMatch) {
+                return `${slashMatch[3]}-${slashMatch[1].padStart(2, '0')}-${slashMatch[2].padStart(2, '0')}`;
+            }
+
+            const timestamp = String(tx.timestamp || '').trim();
+            const parsed = new Date(rawDate || timestamp);
+            if (Number.isNaN(parsed.getTime())) return '';
+            const year = parsed.getFullYear();
+            const month = String(parsed.getMonth() + 1).padStart(2, '0');
+            const day = String(parsed.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function getFilteredTransactions() {
+            return STATE.transactions.filter(tx => {
+                const txVenue = String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue';
+                const venueMatches = statsFilters.selectedVenues.length === 0 || statsFilters.selectedVenues.includes(txVenue);
+                if (!venueMatches) return false;
+
+                if (statsFilters.mode === 'ALL_TIME') return true;
+                const txDate = transactionDateKey(tx);
+                if (!txDate) return false;
+
+                if (statsFilters.mode === 'SINGLE_DATE') {
+                    return Boolean(statsFilters.singleDate) && txDate === statsFilters.singleDate;
+                }
+                if (statsFilters.mode === 'CUSTOM_RANGE') {
+                    if (!statsFilters.startDate || !statsFilters.endDate) return false;
+                    return txDate >= statsFilters.startDate && txDate <= statsFilters.endDate;
+                }
+                return true;
+            });
+        }
+
+        function populateStatsVenueFilter() {
+            const select = document.getElementById('stats-venue-filter');
+            if (!select) return;
+
+            const venues = [...new Set(STATE.transactions.map(tx =>
+                String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue'
+            ))].sort((a, b) => a.localeCompare(b));
+
+            statsFilters.selectedVenues = statsFilters.selectedVenues.filter(venue => venues.includes(venue));
+            select.innerHTML = '<option value="ALL">All Venues</option>' + venues.map(venue =>
+                `<option value="${escapeHtml(venue)}">${escapeHtml(venue)}</option>`
+            ).join('');
+
+            [...select.options].forEach(option => {
+                option.selected = option.value === 'ALL'
+                    ? statsFilters.selectedVenues.length === 0
+                    : statsFilters.selectedVenues.includes(option.value);
+            });
+        }
+
+        
+
+        
+
+        function updateStatsFilterVisibility() {
+            const mode = document.getElementById('stats-date-mode')?.value || statsFilters.mode;
+            const single = document.getElementById('stats-single-date-fields');
+            const range = document.getElementById('stats-custom-range-fields');
+            if (single) single.style.display = mode === 'SINGLE_DATE' ? 'block' : 'none';
+            if (range) range.style.display = mode === 'CUSTOM_RANGE' ? 'grid' : 'none';
+        }
+
+        function syncStatsFilterControls() {
+            populateStatsVenueFilter();
+            const mode = document.getElementById('stats-date-mode');
+            const single = document.getElementById('stats-single-date');
+            const start = document.getElementById('stats-start-date');
+            const end = document.getElementById('stats-end-date');
+            if (mode) mode.value = statsFilters.mode;
+            if (single) single.value = statsFilters.singleDate;
+            if (start) start.value = statsFilters.startDate;
+            if (end) end.value = statsFilters.endDate;
+            updateStatsFilterVisibility();
+        }
+
+        function updateStatsFilterSummary() {
+            return;
+        }
+
+        window.updateStatsFilters = function() {
+            const venueSelect = document.getElementById('stats-venue-filter');
+            let selectedVenues = venueSelect
+                ? [...venueSelect.selectedOptions].map(option => option.value)
+                : [];
+
+            if (selectedVenues.includes('ALL')) selectedVenues = [];
+
+            statsFilters = {
+                selectedVenues,
+                mode: document.getElementById('stats-date-mode')?.value || 'ALL_TIME',
+                singleDate: document.getElementById('stats-single-date')?.value || '',
+                startDate: document.getElementById('stats-start-date')?.value || '',
+                endDate: document.getElementById('stats-end-date')?.value || ''
+            };
+            saveStatsFilters();
+            renderStats();
+        };
+
+        window.clearStatsFilters = function() {
+            statsFilters = { selectedVenues: [], mode: 'ALL_TIME', singleDate: '', startDate: '', endDate: '' };
+            saveStatsFilters();
+            syncStatsFilterControls();
+            renderStats();
+        };
+
+function renderVenueReport() {
             const container = document.getElementById('venue-performance-list');
             if (!container) return;
 
@@ -2206,6 +2484,30 @@
                 console.error("Error reading shift sync params:", err);
             }
         }
+
+        let registerVenueBar = null;
+        function findRegisterVenueBar() {
+            if (registerVenueBar && document.body.contains(registerVenueBar)) return registerVenueBar;
+            const changeButton = [...document.querySelectorAll('button')].find(button =>
+                button.textContent.trim().toLowerCase() === 'change'
+            );
+            registerVenueBar = changeButton ? changeButton.parentElement : null;
+            return registerVenueBar;
+        }
+        function updateRegisterVenueBarVisibility() {
+            const bar = findRegisterVenueBar();
+            const registerTab = document.getElementById('tab-register');
+            if (!bar || !registerTab) return;
+            const registerVisible = registerTab.classList.contains('active');
+            bar.style.display = registerVisible ? '' : 'none';
+        }
+        const tabVisibilityObserver = new MutationObserver(updateRegisterVenueBarVisibility);
+        window.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.tab-content').forEach(tab =>
+                tabVisibilityObserver.observe(tab, { attributes:true, attributeFilter:['class'] })
+            );
+            updateRegisterVenueBarVisibility();
+        });
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && document.getElementById('access-lock')?.classList.contains('active')) {
