@@ -997,6 +997,51 @@
         /* Venue Manager V4 */
         #venue-select { background:#fff; }
         #remove-venue-button { border-width:1px; }
+    
+        /* Stats Venue Chip Picker V1 */
+        .venue-chip-picker { position:relative; width:100%; }
+        .venue-chip-trigger {
+            width:100%; min-height:44px; display:flex; align-items:center; justify-content:space-between;
+            gap:8px; padding:7px 10px; border:1px solid var(--brand-pink); border-radius:10px;
+            background:#fff; color:var(--text-dark); text-align:left; cursor:pointer;
+        }
+        .venue-chip-values { display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-width:0; flex:1; }
+        .venue-chip-placeholder { color:var(--text-muted); font-size:14px; }
+        .venue-filter-chip {
+            display:inline-flex; align-items:center; gap:5px; max-width:100%; padding:5px 8px;
+            border-radius:999px; background:#fff0f7; color:var(--brand-pink);
+            border:1px solid #f3a4ce; font-size:12px; font-weight:800;
+        }
+        .venue-filter-chip-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .venue-filter-chip-remove {
+            border:0; background:transparent; color:inherit; padding:0; font-size:15px;
+            line-height:1; cursor:pointer;
+        }
+        .venue-chip-chevron { flex:0 0 auto; font-size:18px; transition:transform .15s ease; }
+        .venue-chip-trigger[aria-expanded="true"] .venue-chip-chevron { transform:rotate(180deg); }
+        .venue-chip-panel {
+            position:absolute; z-index:1200; left:0; right:0; top:calc(100% + 6px);
+            padding:10px; border:1px solid var(--border-color); border-radius:12px;
+            background:#fff; box-shadow:0 12px 26px rgba(17,17,17,.18);
+        }
+        .venue-chip-search-row { margin-bottom:8px; }
+        .venue-chip-toolbar { display:flex; gap:8px; margin-bottom:8px; }
+        .venue-chip-toolbar button {
+            flex:1; border:1px solid var(--border-color); background:#f9fafb; color:var(--text-dark);
+            padding:7px 8px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;
+        }
+        .venue-chip-options { max-height:240px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; }
+        .venue-chip-option {
+            display:flex; align-items:center; gap:9px; padding:10px 8px; border-radius:8px;
+            font-size:14px; cursor:pointer;
+        }
+        .venue-chip-option:hover, .venue-chip-option:active { background:#f9fafb; }
+        .venue-chip-option input { width:18px; height:18px; min-height:0; accent-color:var(--brand-pink); }
+        .venue-chip-empty { padding:12px; text-align:center; color:var(--text-muted); font-size:12px; }
+        @media (max-width:560px) {
+            .venue-chip-panel { position:fixed; left:14px; right:14px; top:auto; bottom:78px; }
+            .venue-chip-options { max-height:42vh; }
+        }
     </style>
     <!-- Cream Daddy PWA -->
     <link rel="manifest" href="./manifest.json">
@@ -1164,12 +1209,24 @@
             <div class="stats-filter-grid">
                 <div class="stats-filter-field">
                     <label for="stats-venue-filter">Venue</label>
-                    <select id="stats-venue-filter" class="stats-venue-multiselect" multiple size="4"
-                        onchange="updateStatsFilters()">
-                        <option value="ALL">All Venues</option>
-                    </select>
-                    <div class="stats-filter-helper">Select one or more venues. Select All Venues to clear
-                        venue-specific filtering.</div>
+                    <div id="stats-venue-filter" class="venue-chip-picker">
+                        <button id="venue-chip-trigger" class="venue-chip-trigger" type="button"
+                            aria-haspopup="listbox" aria-expanded="false" onclick="toggleVenueChipPanel()">
+                            <span id="venue-chip-values" class="venue-chip-values"></span>
+                            <span class="venue-chip-chevron" aria-hidden="true">⌄</span>
+                        </button>
+                        <div id="venue-chip-panel" class="venue-chip-panel" hidden>
+                            <div class="venue-chip-search-row">
+                                <input id="venue-chip-search" class="form-input" type="search"
+                                    placeholder="Search venues" oninput="renderVenueChipOptions()">
+                            </div>
+                            <div class="venue-chip-toolbar">
+                                <button type="button" onclick="selectAllVenueFilters()">Select All</button>
+                                <button type="button" onclick="clearAllVenueFilters()">Clear All</button>
+                            </div>
+                            <div id="venue-chip-options" class="venue-chip-options" role="listbox" aria-multiselectable="true"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="stats-filter-field">
                     <label for="stats-date-mode">Date</label>
@@ -2494,24 +2551,134 @@ window.openModal = function (id) {
             });
         }
 
-        function populateStatsVenueFilter() {
-            const select = document.getElementById('stats-venue-filter');
-            if (!select) return;
+                // Cream Daddy Stats Venue Chip Picker V1
+        window.statsVenueFilterOptions = [];
 
+        function renderVenueFilterChips() {
+            const container = document.getElementById('venue-chip-values');
+            if (!container) return;
+            const selected = Array.isArray(statsFilters.selectedVenues) ? statsFilters.selectedVenues : [];
+            if (!selected.length) {
+                container.innerHTML = '<span class="venue-chip-placeholder">All Venues</span>';
+                return;
+            }
+            container.innerHTML = '';
+            selected.forEach(venue => {
+                const chip = document.createElement('span');
+                chip.className = 'venue-filter-chip';
+                const text = document.createElement('span');
+                text.className = 'venue-filter-chip-text';
+                text.textContent = venue;
+                const remove = document.createElement('button');
+                remove.className = 'venue-filter-chip-remove';
+                remove.type = 'button';
+                remove.setAttribute('aria-label', `Remove ${venue}`);
+                remove.textContent = '×';
+                remove.addEventListener('click', event => {
+                    event.stopPropagation();
+                    toggleVenueFilterValue(venue, false);
+                });
+                chip.append(text, remove);
+                container.appendChild(chip);
+            });
+        }
+
+        window.renderVenueChipOptions = function () {
+            const container = document.getElementById('venue-chip-options');
+            if (!container) return;
+            const query = String(document.getElementById('venue-chip-search')?.value || '').trim().toLowerCase();
+            const venues = (window.statsVenueFilterOptions || []).filter(venue =>
+                !query || venue.toLowerCase().includes(query)
+            );
+            container.innerHTML = '';
+            if (!venues.length) {
+                container.innerHTML = '<div class="venue-chip-empty">No matching venues</div>';
+                return;
+            }
+            venues.forEach(venue => {
+                const label = document.createElement('label');
+                label.className = 'venue-chip-option';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = (statsFilters.selectedVenues || []).includes(venue);
+                checkbox.addEventListener('change', () => toggleVenueFilterValue(venue, checkbox.checked));
+                const text = document.createElement('span');
+                text.textContent = venue;
+                label.append(checkbox, text);
+                container.appendChild(label);
+            });
+        };
+
+        window.toggleVenueFilterValue = function (venue, shouldSelect) {
+            const selected = new Set(statsFilters.selectedVenues || []);
+            if (shouldSelect) selected.add(venue); else selected.delete(venue);
+            statsFilters.selectedVenues = [...selected];
+            saveStatsFilters();
+            renderVenueFilterChips();
+            renderVenueChipOptions();
+            renderStats();
+        };
+
+        window.selectAllVenueFilters = function () {
+            statsFilters.selectedVenues = [...(window.statsVenueFilterOptions || [])];
+            saveStatsFilters();
+            renderVenueFilterChips();
+            renderVenueChipOptions();
+            renderStats();
+        };
+
+        window.clearAllVenueFilters = function () {
+            statsFilters.selectedVenues = [];
+            saveStatsFilters();
+            renderVenueFilterChips();
+            renderVenueChipOptions();
+            renderStats();
+        };
+
+        window.toggleVenueChipPanel = function () {
+            const panel = document.getElementById('venue-chip-panel');
+            const trigger = document.getElementById('venue-chip-trigger');
+            if (!panel || !trigger) return;
+            const opening = panel.hidden;
+            panel.hidden = !opening;
+            trigger.setAttribute('aria-expanded', String(opening));
+            if (opening) {
+                renderVenueChipOptions();
+                setTimeout(() => document.getElementById('venue-chip-search')?.focus(), 0);
+            }
+        };
+
+        document.addEventListener('click', event => {
+            const picker = document.getElementById('stats-venue-filter');
+            const panel = document.getElementById('venue-chip-panel');
+            const trigger = document.getElementById('venue-chip-trigger');
+            if (picker && panel && !picker.contains(event.target)) {
+                panel.hidden = true;
+                trigger?.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            const panel = document.getElementById('venue-chip-panel');
+            const trigger = document.getElementById('venue-chip-trigger');
+            if (panel && !panel.hidden) {
+                panel.hidden = true;
+                trigger?.setAttribute('aria-expanded', 'false');
+                trigger?.focus();
+            }
+        });
+
+function populateStatsVenueFilter() {
             const venues = [...new Set(STATE.transactions.map(tx =>
                 String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue'
             ))].sort((a, b) => a.localeCompare(b));
 
-            statsFilters.selectedVenues = statsFilters.selectedVenues.filter(venue => venues.includes(venue));
-            select.innerHTML = '<option value="ALL">All Venues</option>' + venues.map(venue =>
-                `<option value="${escapeHtml(venue)}">${escapeHtml(venue)}</option>`
-            ).join('');
-
-            [...select.options].forEach(option => {
-                option.selected = option.value === 'ALL'
-                    ? statsFilters.selectedVenues.length === 0
-                    : statsFilters.selectedVenues.includes(option.value);
-            });
+            statsFilters.selectedVenues = (statsFilters.selectedVenues || [])
+                .filter(venue => venues.includes(venue));
+            window.statsVenueFilterOptions = venues;
+            renderVenueFilterChips();
+            renderVenueChipOptions();
         }
 
 
@@ -2537,6 +2704,8 @@ window.openModal = function (id) {
             if (start) start.value = statsFilters.startDate;
             if (end) end.value = statsFilters.endDate;
             updateStatsFilterVisibility();
+            renderVenueFilterChips();
+            renderVenueChipOptions();
         }
 
         function updateStatsFilterSummary() {
@@ -2544,15 +2713,8 @@ window.openModal = function (id) {
         }
 
         window.updateStatsFilters = function () {
-            const venueSelect = document.getElementById('stats-venue-filter');
-            let selectedVenues = venueSelect
-                ? [...venueSelect.selectedOptions].map(option => option.value)
-                : [];
-
-            if (selectedVenues.includes('ALL')) selectedVenues = [];
-
             statsFilters = {
-                selectedVenues,
+                selectedVenues: Array.isArray(statsFilters.selectedVenues) ? [...statsFilters.selectedVenues] : [],
                 mode: document.getElementById('stats-date-mode')?.value || 'ALL_TIME',
                 singleDate: document.getElementById('stats-single-date')?.value || '',
                 startDate: document.getElementById('stats-start-date')?.value || '',
