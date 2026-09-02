@@ -9,6 +9,8 @@
  */
 var MENU_SHEET = 'Menu & Inventory';
 var SALES_SHEET = 'Sales Log';
+var VENUES_SHEET = 'Venues';
+// Cream Daddy Shared Venue Catalog V1
 
 function doGet(e) {
   try {
@@ -85,6 +87,14 @@ function processWrite_(data) {
   lock.waitLock(30000);
   try {
     var sheets = ensureSheets_();
+    if (data.action === 'add_venue') {
+      var addedVenue = addVenue_(sheets.venues, data.venue);
+      return {status:'success', action:'add_venue', venue:addedVenue};
+    }
+    if (data.action === 'remove_venue') {
+      var removedVenue = removeVenue_(sheets.venues, data.venue);
+      return {status:'success', action:'remove_venue', venue:removedVenue};
+    }
     if (data.action === 'update_menu' && Array.isArray(data.flavors)) {
       writeMenu_(sheets.menu, data.flavors);
       return {status:'success', action:'update_menu', count:data.flavors.length};
@@ -139,7 +149,46 @@ function pullAll_() {
     });
   }
   transactions.reverse();
-  return {status:'success', serverTime:new Date().toISOString(), flavors:flavors, transactions:transactions};
+  var venues = readVenues_(sheets.venues);
+  return {status:'success', serverTime:new Date().toISOString(), flavors:flavors, transactions:transactions, venues:venues};
+}
+
+function readVenues_(sheet) {
+  if (sheet.getLastRow() <= 1) return [];
+  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getDisplayValues();
+  var venues = [];
+  values.forEach(function(row) {
+    var venue = String(row[0] || '').trim();
+    if (venue && !venues.some(function(item){ return item.toLowerCase() === venue.toLowerCase(); })) {
+      venues.push(venue);
+    }
+  });
+  return venues.sort(function(a, b){ return a.localeCompare(b); });
+}
+
+function addVenue_(sheet, value) {
+  var venue = String(value || '').trim();
+  if (!venue) throw new Error('Venue name is required.');
+  var venues = readVenues_(sheet);
+  var existing = venues.filter(function(item){ return item.toLowerCase() === venue.toLowerCase(); })[0];
+  if (existing) return existing;
+  sheet.appendRow([venue, new Date()]);
+  SpreadsheetApp.flush();
+  return venue;
+}
+
+function removeVenue_(sheet, value) {
+  var venue = String(value || '').trim();
+  if (!venue) throw new Error('Venue name is required.');
+  if (sheet.getLastRow() <= 1) return venue;
+  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getDisplayValues();
+  for (var i = values.length - 1; i >= 0; i--) {
+    if (String(values[i][0] || '').trim().toLowerCase() === venue.toLowerCase()) {
+      sheet.deleteRow(i + 2);
+    }
+  }
+  SpreadsheetApp.flush();
+  return venue;
 }
 
 function writeMenu_(sheet, flavors) {
@@ -208,9 +257,23 @@ function ensureSheets_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var menu = ss.getSheetByName(MENU_SHEET) || ss.insertSheet(MENU_SHEET);
   var sales = ss.getSheetByName(SALES_SHEET) || ss.insertSheet(SALES_SHEET);
+  var venues = ss.getSheetByName(VENUES_SHEET) || ss.insertSheet(VENUES_SHEET);
   if (menu.getLastRow() === 0) menu.appendRow(['Product ID','Product Name','Price','Current Stock','Photo URL / Base64','Updated At']);
   if (sales.getLastRow() === 0) sales.appendRow(['Timestamp','Venue','Business Date','Net Total','Units Sold','Units Gifted','Summary','Items JSON','Transaction ID']);
-  return {menu:menu, sales:sales};
+  if (venues.getLastRow() === 0) venues.appendRow(['Venue','Updated At']);
+  if (venues.getLastRow() === 1) {
+    var seed = {};
+    if (sales.getLastRow() > 1) {
+      sales.getRange(2, 2, sales.getLastRow() - 1, 1).getDisplayValues().forEach(function(row) {
+        var venue = String(row[0] || '').trim();
+        if (venue) seed[venue.toLowerCase()] = venue;
+      });
+    }
+    if (!Object.keys(seed).length) seed['daily pop-up'] = 'Daily Pop-Up';
+    var seedRows = Object.keys(seed).sort().map(function(key){ return [seed[key], new Date()]; });
+    if (seedRows.length) venues.getRange(2, 1, seedRows.length, 2).setValues(seedRows);
+  }
+  return {menu:menu, sales:sales, venues:venues};
 }
 
 function output_(obj, callback) {

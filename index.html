@@ -1359,7 +1359,7 @@
             </button>
 
             <p style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.4;">
-                Removing a venue only hides it from this device. Google Sheet history is unchanged.
+                Removing a venue removes it from the shared venue list only. Historical Sales Log records remain unchanged.
             </p>
         </div>
     </div>
@@ -1409,6 +1409,7 @@
             flavors: [],
             cart: [],
             transactions: [],
+            venues: [],
             syncRoom: "CREAM-DADDY-" + Math.floor(100 + Math.random() * 900),
             scriptUrl: HARDCODED_WEBHOOK,
             tempPhotoBase64: "",
@@ -1545,6 +1546,9 @@
                 if (Array.isArray(data.transactions)) {
                     STATE.transactions = data.transactions;
                 }
+                if (Array.isArray(data.venues)) {
+                    STATE.venues = data.venues;
+                }
                 persistState();
                 renderAll();
                 updateSyncHeaderStatus('☁️ Live Cloud');
@@ -1646,11 +1650,8 @@
             renderInventoryTable();
         };
 
-                // Cream Daddy Venue Manager V4
+                // Cream Daddy Shared Venue Catalog Frontend V2
         const VENUE_ADD_NEW = '__ADD_NEW_VENUE__';
-        const VENUE_LOCAL_KEY = 'cream_daddy_local_venues';
-        const VENUE_HIDDEN_KEY = 'cream_daddy_hidden_venues';
-
         function localTodayDate() {
             const now = new Date();
             const year = now.getFullYear();
@@ -1658,41 +1659,23 @@
             const day = String(now.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         }
+        function getAvailableVenues() {
+            const venues = Array.isArray(STATE.venues) ? [...STATE.venues] : [];
+            const active = String(STATE.venue || '').trim();
 
-        function readVenueList(key) {
-            try {
-                const values = JSON.parse(localStorage.getItem(key) || '[]');
-                return Array.isArray(values) ? values.map(value => String(value).trim()).filter(Boolean) : [];
-            } catch (error) {
-                return [];
+            if (active && !venues.some(venue => String(venue).trim().toLowerCase() === active.toLowerCase())) {
+                venues.push(active);
             }
-        }
 
-        function writeVenueList(key, values) {
             const unique = [];
-            values.forEach(value => {
+            venues.forEach(value => {
                 const clean = String(value || '').trim();
                 if (clean && !unique.some(item => item.toLowerCase() === clean.toLowerCase())) {
                     unique.push(clean);
                 }
             });
-            localStorage.setItem(key, JSON.stringify(unique));
-        }
 
-        function getAvailableVenues() {
-            const hidden = readVenueList(VENUE_HIDDEN_KEY);
-            const local = readVenueList(VENUE_LOCAL_KEY);
-            const sheet = (STATE.transactions || []).map(tx => String(tx.venue || '').trim()).filter(Boolean);
-            const candidates = [...sheet, ...local, String(STATE.venue || '').trim()].filter(Boolean);
-            const visible = [];
-
-            candidates.forEach(venue => {
-                const isHidden = hidden.some(name => name.toLowerCase() === venue.toLowerCase());
-                const exists = visible.some(name => name.toLowerCase() === venue.toLowerCase());
-                if (!isHidden && !exists) visible.push(venue);
-            });
-
-            return visible.sort((a, b) => a.localeCompare(b));
+            return unique.sort((a, b) => a.localeCompare(b));
         }
 
         function populateVenueSelect() {
@@ -1731,25 +1714,25 @@
             removeButton.style.display = addingNew ? 'none' : 'block';
         };
 
-        window.removeSelectedVenue = function () {
+        window.removeSelectedVenue = async function () {
             const select = document.getElementById('venue-select');
             if (!select || !select.value || select.value === VENUE_ADD_NEW) return;
 
             const venue = select.value;
-            const confirmed = confirm(`Remove "${venue}" from this device's dropdown?
+            const confirmed = confirm(
+                `Remove "${venue}" from the shared venue list?
 
-Google Sheet history will not be changed.`);
+Historical Sales Log records will remain unchanged.`
+            );
             if (!confirmed) return;
 
-            const hidden = readVenueList(VENUE_HIDDEN_KEY);
-            hidden.push(venue);
-            writeVenueList(VENUE_HIDDEN_KEY, hidden);
-
-            const local = readVenueList(VENUE_LOCAL_KEY)
-                .filter(name => name.toLowerCase() !== venue.toLowerCase());
-            writeVenueList(VENUE_LOCAL_KEY, local);
-
+            STATE.venues = (STATE.venues || []).filter(
+                item => String(item).toLowerCase() !== venue.toLowerCase()
+            );
             populateVenueSelect();
+
+            await sendSheetPayload({ action: 'remove_venue', venue: venue });
+            setTimeout(() => fetchFromGoogleSheet(false), 1200);
         };
 
 window.openModal = function (id) {
@@ -1905,7 +1888,7 @@ window.openModal = function (id) {
             }
         };
 
-        window.saveVenue = function () {
+        window.saveVenue = async function () {
             const select = document.getElementById('venue-select');
             const newInput = document.getElementById('new-venue-input');
             const isNew = select && select.value === VENUE_ADD_NEW;
@@ -1922,13 +1905,12 @@ window.openModal = function (id) {
             STATE.date = document.getElementById('venue-date').value || localTodayDate();
 
             if (isNew) {
-                const local = readVenueList(VENUE_LOCAL_KEY);
-                local.push(venue);
-                writeVenueList(VENUE_LOCAL_KEY, local);
-
-                const hidden = readVenueList(VENUE_HIDDEN_KEY)
-                    .filter(name => name.toLowerCase() !== venue.toLowerCase());
-                writeVenueList(VENUE_HIDDEN_KEY, hidden);
+                if (!Array.isArray(STATE.venues)) STATE.venues = [];
+                if (!STATE.venues.some(item => String(item).toLowerCase() === venue.toLowerCase())) {
+                    STATE.venues.push(venue);
+                }
+                await sendSheetPayload({ action: 'add_venue', venue: venue });
+                setTimeout(() => fetchFromGoogleSheet(false), 1200);
             }
 
             persistState();
