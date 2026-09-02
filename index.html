@@ -993,6 +993,10 @@
         #stats-date-mode {
             min-height: 42px;
         }
+    
+        /* Venue Manager V4 */
+        #venue-select { background:#fff; }
+        #remove-venue-button { border-width:1px; }
     </style>
     <!-- Cream Daddy PWA -->
     <link rel="manifest" href="./manifest.json">
@@ -1328,18 +1332,35 @@
         <div class="modal-box">
             <button class="btn-modal-close" onclick="closeModal('venue-modal')">&times;</button>
             <div class="modal-title">Select Today's Venue</div>
+
             <div class="form-group">
-                <label class="form-label">Venue / Pop-up Location</label>
-                <input type="text" id="venue-input" class="form-input" placeholder="e.g. Cherry Creek Farmers Market">
+                <label class="form-label" for="venue-select">Venue / Pop-up Location</label>
+                <select id="venue-select" class="form-input" onchange="handleVenueChoice()"></select>
             </div>
+
+            <div id="new-venue-group" class="form-group" style="display:none;">
+                <label class="form-label" for="new-venue-input">New Venue Name</label>
+                <input type="text" id="new-venue-input" class="form-input"
+                    placeholder="e.g. Cherry Creek Farmers Market">
+            </div>
+
             <div class="form-group">
-                <label class="form-label">Date</label>
+                <label class="form-label" for="venue-date">Date</label>
                 <input type="date" id="venue-date" class="form-input">
             </div>
-            <button class="btn-primary" style="width: 100%; margin-bottom: 16px;" onclick="saveVenue()">Set Active
-                Venue</button>
-            <div class="card-title" style="font-size: 14px; margin-bottom: 8px;">Saved Venues</div>
-            <div id="saved-venues-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+
+            <button class="btn-primary" style="width:100%;margin-bottom:10px;" onclick="saveVenue()">
+                Set Active Venue
+            </button>
+
+            <button id="remove-venue-button" class="btn-danger-outline"
+                style="width:100%;padding:9px;display:none;" onclick="removeSelectedVenue()">
+                Remove Selected Venue
+            </button>
+
+            <p style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.4;">
+                Removing a venue only hides it from this device. Google Sheet history is unchanged.
+            </p>
         </div>
     </div>
 
@@ -1625,14 +1646,120 @@
             renderInventoryTable();
         };
 
-        window.openModal = function (id) {
+                // Cream Daddy Venue Manager V4
+        const VENUE_ADD_NEW = '__ADD_NEW_VENUE__';
+        const VENUE_LOCAL_KEY = 'cream_daddy_local_venues';
+        const VENUE_HIDDEN_KEY = 'cream_daddy_hidden_venues';
+
+        function localTodayDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function readVenueList(key) {
+            try {
+                const values = JSON.parse(localStorage.getItem(key) || '[]');
+                return Array.isArray(values) ? values.map(value => String(value).trim()).filter(Boolean) : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function writeVenueList(key, values) {
+            const unique = [];
+            values.forEach(value => {
+                const clean = String(value || '').trim();
+                if (clean && !unique.some(item => item.toLowerCase() === clean.toLowerCase())) {
+                    unique.push(clean);
+                }
+            });
+            localStorage.setItem(key, JSON.stringify(unique));
+        }
+
+        function getAvailableVenues() {
+            const hidden = readVenueList(VENUE_HIDDEN_KEY);
+            const local = readVenueList(VENUE_LOCAL_KEY);
+            const sheet = (STATE.transactions || []).map(tx => String(tx.venue || '').trim()).filter(Boolean);
+            const candidates = [...sheet, ...local, String(STATE.venue || '').trim()].filter(Boolean);
+            const visible = [];
+
+            candidates.forEach(venue => {
+                const isHidden = hidden.some(name => name.toLowerCase() === venue.toLowerCase());
+                const exists = visible.some(name => name.toLowerCase() === venue.toLowerCase());
+                if (!isHidden && !exists) visible.push(venue);
+            });
+
+            return visible.sort((a, b) => a.localeCompare(b));
+        }
+
+        function populateVenueSelect() {
+            const select = document.getElementById('venue-select');
+            if (!select) return;
+
+            const venues = getAvailableVenues();
+            const active = String(STATE.venue || '').trim();
+            select.innerHTML = '';
+
+            venues.forEach(venue => {
+                const option = document.createElement('option');
+                option.value = venue;
+                option.textContent = venue;
+                select.appendChild(option);
+            });
+
+            const addOption = document.createElement('option');
+            addOption.value = VENUE_ADD_NEW;
+            addOption.textContent = '＋ Add New Venue';
+            select.appendChild(addOption);
+
+            const activeMatch = venues.find(venue => venue.toLowerCase() === active.toLowerCase());
+            select.value = activeMatch || (venues.length ? venues[0] : VENUE_ADD_NEW);
+            handleVenueChoice();
+        }
+
+        window.handleVenueChoice = function () {
+            const select = document.getElementById('venue-select');
+            const newGroup = document.getElementById('new-venue-group');
+            const removeButton = document.getElementById('remove-venue-button');
+            if (!select || !newGroup || !removeButton) return;
+
+            const addingNew = select.value === VENUE_ADD_NEW;
+            newGroup.style.display = addingNew ? 'block' : 'none';
+            removeButton.style.display = addingNew ? 'none' : 'block';
+        };
+
+        window.removeSelectedVenue = function () {
+            const select = document.getElementById('venue-select');
+            if (!select || !select.value || select.value === VENUE_ADD_NEW) return;
+
+            const venue = select.value;
+            const confirmed = confirm(`Remove "${venue}" from this device's dropdown?
+
+Google Sheet history will not be changed.`);
+            if (!confirmed) return;
+
+            const hidden = readVenueList(VENUE_HIDDEN_KEY);
+            hidden.push(venue);
+            writeVenueList(VENUE_HIDDEN_KEY, hidden);
+
+            const local = readVenueList(VENUE_LOCAL_KEY)
+                .filter(name => name.toLowerCase() !== venue.toLowerCase());
+            writeVenueList(VENUE_LOCAL_KEY, local);
+
+            populateVenueSelect();
+        };
+
+window.openModal = function (id) {
             const modal = document.getElementById(id);
             if (modal) {
                 modal.classList.add('active');
                 if (id === 'venue-modal') {
-                    document.getElementById('venue-input').value = STATE.venue;
-                    document.getElementById('venue-date').value = STATE.date;
-                    renderSavedVenues();
+                    document.getElementById('venue-date').value = localTodayDate();
+                    document.getElementById('new-venue-input').value = '';
+                    populateVenueSelect();
                 }
                 if (id === 'sync-modal') {
                     generateQR();
@@ -1779,14 +1906,29 @@
         };
 
         window.saveVenue = function () {
-            const venue = document.getElementById('venue-input').value.trim() || "Daily Pop-Up";
-            const date = document.getElementById('venue-date').value || new Date().toISOString().split('T')[0];
+            const select = document.getElementById('venue-select');
+            const newInput = document.getElementById('new-venue-input');
+            const isNew = select && select.value === VENUE_ADD_NEW;
+            const venue = isNew
+                ? String(newInput?.value || '').trim()
+                : String(select?.value || '').trim();
+
+            if (!venue) {
+                alert('Please select a venue or enter a new venue name.');
+                return;
+            }
 
             STATE.venue = venue;
-            STATE.date = date;
+            STATE.date = document.getElementById('venue-date').value || localTodayDate();
 
-            if (!STATE.savedVenues.includes(venue)) {
-                STATE.savedVenues.push(venue);
+            if (isNew) {
+                const local = readVenueList(VENUE_LOCAL_KEY);
+                local.push(venue);
+                writeVenueList(VENUE_LOCAL_KEY, local);
+
+                const hidden = readVenueList(VENUE_HIDDEN_KEY)
+                    .filter(name => name.toLowerCase() !== venue.toLowerCase());
+                writeVenueList(VENUE_HIDDEN_KEY, hidden);
             }
 
             persistState();
