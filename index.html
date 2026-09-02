@@ -203,6 +203,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 10px;
         }
 
         .flavor-fallback-icon {
@@ -788,6 +789,17 @@
             border-radius: 999px;
         }
 
+        .venue-button-row {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 0px;
+            margin-top: 40px;
+        }
+
+        .venue-button-row button {
+            flex: 1;
+        }
+
         .product-report-title {
             display: flex;
             align-items: center;
@@ -1009,10 +1021,15 @@
         #stats-date-mode {
             min-height: 42px;
         }
-    
+
         /* Venue Manager V4 */
-        #venue-select { background:#fff; }
-        #remove-venue-button { border-width:1px; }
+        #venue-select {
+            background: #fff;
+        }
+
+        #remove-venue-button {
+            border-width: 1px;
+        }
     </style>
 </head>
 
@@ -1353,18 +1370,15 @@
                 <input type="date" id="venue-date" class="form-input">
             </div>
 
-            <button class="btn-primary" style="width:100%;margin-bottom:10px;" onclick="saveVenue()">
-                Set Active Venue
-            </button>
-
-            <button id="remove-venue-button" class="btn-danger-outline"
-                style="width:100%;padding:9px;display:none;" onclick="removeSelectedVenue()">
-                Remove Selected Venue
-            </button>
-
-            <p style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.4;">
-                Removing a venue removes it from the shared venue list only. Historical Sales Log records remain unchanged.
-            </p>
+            <div class="venue-button-row">
+                <button id="remove-venue-button" class="btn-danger-outline" style="display:none;"
+                    onclick="removeSelectedVenue()">
+                    Remove Selected Venue
+                </button>
+                <button class="btn-primary" onclick="saveVenue()">
+                    Set Active Venue
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1654,7 +1668,7 @@
             renderInventoryTable();
         };
 
-                // Cream Daddy Shared Venue Catalog Frontend V2
+        // Cream Daddy Shared Venue Catalog Frontend V2
         const VENUE_ADD_NEW = '__ADD_NEW_VENUE__';
         function localTodayDate() {
             const now = new Date();
@@ -1739,7 +1753,7 @@ Historical Sales Log records will remain unchanged.`
             setTimeout(() => fetchFromGoogleSheet(false), 1200);
         };
 
-window.openModal = function (id) {
+        window.openModal = function (id) {
             const modal = document.getElementById(id);
             if (modal) {
                 modal.classList.add('active');
@@ -2250,8 +2264,8 @@ window.openModal = function (id) {
                                 ${f.photo ? `<img src="${f.photo}" alt="${f.name}">` : `<span class="flavor-fallback-icon">🍦</span>`}
                             </div>
                             <div class="flavor-name">${f.name}</div>
-                            <div class="flavor-price">$${f.price.toFixed(2)}</div>
                             <div class="flavor-stock-tag ${remaining <= 3 ? 'low' : ''}">${remaining} Left</div>
+                            <div class="flavor-price">$${f.price.toFixed(2)}</div>
                         </div>
                     `;
                 }).join('');
