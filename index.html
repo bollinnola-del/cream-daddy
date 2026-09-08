@@ -95,7 +95,7 @@
             align-items: center;
             font-size: 13px;
             font-weight: 700;
-            
+
         }
 
         .shift-bar button {
@@ -162,6 +162,8 @@
             flex-direction: column;
             gap: 6px;
             margin-bottom: 20px;
+            margin-left: 10px;
+            margin-right: 10px;
         }
 
         .flavor-card {
@@ -203,6 +205,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 6px;
         }
 
         .flavor-fallback-icon {
@@ -236,6 +239,7 @@
             background: #fee2e2;
             color: var(--danger);
         }
+
         .flavor-stock-tag.sold-out {
             background: var(--brand-black);
             color: var(--brand-white);
@@ -321,7 +325,6 @@
             height: 32px;
             border-radius: 6px;
             object-fit: cover;
-            border: 1px solid var(--brand-gold);
         }
 
         .item-details-name {
@@ -544,7 +547,6 @@
             height: 32px;
             border-radius: 6px;
             object-fit: cover;
-            border: 1px solid var(--brand-gold);
         }
 
         .stats-grid {
@@ -800,7 +802,6 @@
             height: 32px;
             border-radius: 8px;
             flex: 0 0 32px;
-            border: 1px solid var(--brand-gold);
         }
 
         .product-report-thumb {
@@ -993,54 +994,331 @@
         #stats-date-mode {
             min-height: 42px;
         }
-    
+
         /* Venue Manager V4 */
-        #venue-select { background:#fff; }
-        #remove-venue-button { border-width:1px; }
-    
+        #venue-select {
+            background: #fff;
+        }
+
+        #remove-venue-button {
+            border-width: 1px;
+        }
+
         /* Stats Venue Chip Picker V1 */
-        .venue-chip-picker { position:relative; width:100%; }
+        .venue-chip-picker {
+            position: relative;
+            width: 100%;
+        }
+
         .venue-chip-trigger {
-            width:100%; min-height:44px; display:flex; align-items:center; justify-content:space-between;
-            gap:8px; padding:7px 10px; border:1px solid var(--brand-pink); border-radius:10px;
-            background:#fff; color:var(--text-dark); text-align:left; cursor:pointer;
+            width: 100%;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 7px 10px;
+            border: 1px solid var(--brand-pink);
+            border-radius: 10px;
+            background: #fff;
+            color: var(--text-dark);
+            text-align: left;
+            cursor: pointer;
         }
-        .venue-chip-values { display:flex; flex-wrap:wrap; align-items:center; gap:6px; min-width:0; flex:1; }
-        .venue-chip-placeholder { color:var(--text-muted); font-size:14px; }
+
+        .venue-chip-values {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .venue-chip-placeholder {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
         .venue-filter-chip {
-            display:inline-flex; align-items:center; gap:5px; max-width:100%; padding:5px 8px;
-            border-radius:999px; background:#fff0f7; color:var(--brand-pink);
-            border:1px solid #f3a4ce; font-size:12px; font-weight:800;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            max-width: 100%;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #fff0f7;
+            color: var(--brand-pink);
+            border: 1px solid #f3a4ce;
+            font-size: 12px;
+            font-weight: 800;
         }
-        .venue-filter-chip-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+        .venue-filter-chip-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
         .venue-filter-chip-remove {
-            border:0; background:transparent; color:inherit; padding:0; font-size:15px;
-            line-height:1; cursor:pointer;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: 15px;
+            line-height: 1;
+            cursor: pointer;
         }
-        .venue-chip-chevron { flex:0 0 auto; font-size:18px; transition:transform .15s ease; }
-        .venue-chip-trigger[aria-expanded="true"] .venue-chip-chevron { transform:rotate(180deg); }
+
+        .venue-chip-chevron {
+            flex: 0 0 auto;
+            font-size: 18px;
+            transition: transform .15s ease;
+        }
+
+        .venue-chip-trigger[aria-expanded="true"] .venue-chip-chevron {
+            transform: rotate(180deg);
+        }
+
         .venue-chip-panel {
-            position:absolute; z-index:1200; left:0; right:0; top:calc(100% + 6px);
-            padding:10px; border:1px solid var(--border-color); border-radius:12px;
-            background:#fff; box-shadow:0 12px 26px rgba(17,17,17,.18);
+            position: absolute;
+            z-index: 1200;
+            left: 0;
+            right: 0;
+            top: calc(100% + 6px);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 12px 26px rgba(17, 17, 17, .18);
         }
-        .venue-chip-search-row { margin-bottom:8px; }
-        .venue-chip-toolbar { display:flex; gap:8px; margin-bottom:8px; }
+
+        .venue-chip-search-row {
+            margin-bottom: 8px;
+        }
+
+        .venue-chip-toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
         .venue-chip-toolbar button {
-            flex:1; border:1px solid var(--border-color); background:#f9fafb; color:var(--text-dark);
-            padding:7px 8px; border-radius:8px; font-size:12px; font-weight:800; cursor:pointer;
+            flex: 1;
+            border: 1px solid var(--border-color);
+            background: #f9fafb;
+            color: var(--text-dark);
+            padding: 7px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
         }
-        .venue-chip-options { max-height:240px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; }
+
+        .venue-chip-options {
+            max-height: 240px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
         .venue-chip-option {
-            display:flex; align-items:center; gap:9px; padding:10px 8px; border-radius:8px;
-            font-size:14px; cursor:pointer;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 8px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
         }
-        .venue-chip-option:hover, .venue-chip-option:active { background:#f9fafb; }
-        .venue-chip-option input { width:18px; height:18px; min-height:0; accent-color:var(--brand-pink); }
-        .venue-chip-empty { padding:12px; text-align:center; color:var(--text-muted); font-size:12px; }
+
+        .venue-chip-option:hover,
+        .venue-chip-option:active {
+            background: #f9fafb;
+        }
+
+        .venue-chip-option input {
+            width: 18px;
+            height: 18px;
+            min-height: 0;
+            accent-color: var(--brand-pink);
+        }
+
+        .venue-chip-empty {
+            padding: 12px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
         @media (max-width:560px) {
-            .venue-chip-panel { position:fixed; left:14px; right:14px; top:auto; bottom:78px; }
-            .venue-chip-options { max-height:42vh; }
+            .venue-chip-panel {
+                position: fixed;
+                left: 14px;
+                right: 14px;
+                top: auto;
+                bottom: 78px;
+            }
+
+            .venue-chip-options {
+                max-height: 42vh;
+            }
+        }
+
+        /* Cream Daddy UI Polish V3 */
+        :root {
+            --app-header-height: 54px;
+        }
+
+        header {
+            min-height: var(--app-header-height) !important;
+            height: var(--app-header-height) !important;
+            padding-top: 7px !important;
+            padding-bottom: 7px !important;
+        }
+
+        header .brand-logo-img {
+            max-height: 32px !important;
+        }
+
+        .bottom-nav {
+            height: var(--app-header-height) !important;
+        }
+
+        body {
+            padding-bottom: calc(var(--app-header-height) + 25px) !important;
+        }
+
+        #tab-register .cart-section {
+            position: sticky;
+            top: var(--app-header-height);
+            z-index: 90;
+        }
+
+        #empty-cart-message {
+            display: none !important;
+        }
+
+        #tab-register .cart-items-list {
+            max-height: 150px !important;
+            overflow-y: auto !important;
+            overscroll-behavior: contain;
+            scrollbar-gutter: stable;
+        }
+
+        #tab-register .cart-item-row {
+            height: 52px !important;
+            min-height: 52px !important;
+            flex: 0 0 52px !important;
+            overflow: hidden;
+        }
+
+        #tab-register .cart-item-row .item-actions {
+            align-self: stretch;
+            height: calc(100% + 16px);
+            min-height: calc(100% + 16px);
+            margin-top: -8px;
+            margin-right: -10px;
+            margin-bottom: -8px;
+            display: flex;
+            align-items: stretch;
+        }
+
+        #tab-register .cart-item-row .item-actions>button,
+        #tab-register .cart-item-row .item-actions .btn-comp-toggle,
+        #tab-register .cart-item-row .item-actions .qty-stepper {
+            height: 100%;
+            min-height: 100%;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .order-total-counts {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .order-total-counts strong {
+            color: var(--text-dark);
+            font-weight: 900;
+        }
+
+        .btn-comp-toggle.is-free {
+            background: var(--success) !important;
+            color: #fff !important;
+            border-color: var(--success) !important;
+        }
+
+        .item-details-sub.free-item-text {
+            color: var(--success) !important;
+            font-weight: 800 !important;
+        }
+
+        #gift-actions .btn-checkout {
+            background: var(--success) !important;
+            color: #fff !important;
+        }
+
+        .receipt-log-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-areas: "items total" "time venue";
+            column-gap: 12px;
+            row-gap: 5px;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .receipt-log-items {
+            grid-area: items;
+            min-width: 0;
+            color: var(--text-dark);
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .receipt-log-total {
+            grid-area: total;
+            color: var(--text-dark);
+            font-weight: 900;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .receipt-log-time {
+            grid-area: time;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .receipt-log-venue {
+            grid-area: venue;
+            color: var(--text-muted);
+            font-weight: 400;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 420px) {
+            .receipt-log-row {
+                column-gap: 8px;
+            }
+
+            .receipt-log-venue {
+                max-width: 145px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .order-total-counts {
+                font-size: 11px;
+            }
         }
     </style>
     <!-- Cream Daddy PWA -->
@@ -1070,8 +1348,7 @@
     </div>
     <header>
         <div class="logo-container">
-            <img src="assets/cream-daddy-banner.png"
-                alt="Cream Daddy Logo" class="brand-logo-img"
+            <img src="assets/cream-daddy-banner.png" alt="Cream Daddy Logo" class="brand-logo-img"
                 onerror="this.outerHTML='<h2 style=\'color:var(--brand-pink);\'>CREAM DADDY</h2>'">
         </div>
         <div class="header-actions">
@@ -1094,23 +1371,20 @@
             </div>
             <div id="cart-list" class="cart-items-list"></div>
             <div class="cart-summary">
-                <div class="summary-row">
-                    <span>Paid Units Sold</span>
-                    <span id="cart-paid-units">0</span>
-                </div>
-                <div class="summary-row">
-                    <span>Free / Comps</span>
-                    <span id="cart-comp-units">0</span>
-                </div>
                 <div class="summary-row total-row">
-                    <span>Order Total</span>
+                    <span>
+                        Order Total
+                        <span class="order-total-counts">
+                            (Paid: <strong id="cart-paid-units">0</strong> • Free: <strong
+                                id="cart-comp-units">0</strong>)
+                        </span>
+                    </span>
                     <span id="cart-total-price">$0.00</span>
                 </div>
             </div>
             <!-- Normal checkout buttons -->
 
             <div id="empty-cart-message" style="text-align:center;padding:12px;color:var(--text-muted);font-size:13px;">
-                Tap a flavor card below to start an order.
             </div>
             <div id="checkout-actions" style="
                     display:grid;
@@ -1131,7 +1405,7 @@
             <!-- Only shown when every item in the cart is free -->
             <div id="gift-actions" style="display:none;">
                 <button class="btn-checkout" style="background:#10b981;color:#fff;" onclick="completeSale('gift')">
-                    🎁 Gift
+                    🎁 Free
                 </button>
             </div>
             <!-- Only shown after Card is pressed -->
@@ -1210,8 +1484,8 @@
                 <div class="stats-filter-field">
                     <label for="stats-venue-filter">Venue</label>
                     <div id="stats-venue-filter" class="venue-chip-picker">
-                        <button id="venue-chip-trigger" class="venue-chip-trigger" type="button"
-                            aria-haspopup="listbox" aria-expanded="false" onclick="toggleVenueChipPanel()">
+                        <button id="venue-chip-trigger" class="venue-chip-trigger" type="button" aria-haspopup="listbox"
+                            aria-expanded="false" onclick="toggleVenueChipPanel()">
                             <span id="venue-chip-values" class="venue-chip-values"></span>
                             <span class="venue-chip-chevron" aria-hidden="true">⌄</span>
                         </button>
@@ -1224,7 +1498,8 @@
                                 <button type="button" onclick="selectAllVenueFilters()">Select All</button>
                                 <button type="button" onclick="clearAllVenueFilters()">Clear All</button>
                             </div>
-                            <div id="venue-chip-options" class="venue-chip-options" role="listbox" aria-multiselectable="true"></div>
+                            <div id="venue-chip-options" class="venue-chip-options" role="listbox"
+                                aria-multiselectable="true"></div>
                         </div>
                     </div>
                 </div>
@@ -1410,13 +1685,14 @@
                 Set Active Venue
             </button>
 
-            <button id="remove-venue-button" class="btn-danger-outline"
-                style="width:100%;padding:9px;display:none;" onclick="removeSelectedVenue()">
+            <button id="remove-venue-button" class="btn-danger-outline" style="width:100%;padding:9px;display:none;"
+                onclick="removeSelectedVenue()">
                 Remove Selected Venue
             </button>
 
             <p style="font-size:11px;color:var(--text-muted);margin-top:8px;line-height:1.4;">
-                Removing a venue removes it from the shared venue list only. Historical Sales Log records remain unchanged.
+                Removing a venue removes it from the shared venue list only. Historical Sales Log records remain
+                unchanged.
             </p>
         </div>
     </div>
@@ -1707,7 +1983,7 @@
             renderInventoryTable();
         };
 
-                // Cream Daddy Shared Venue Catalog Frontend V2
+        // Cream Daddy Shared Venue Catalog Frontend V2
         const VENUE_ADD_NEW = '__ADD_NEW_VENUE__';
         function localTodayDate() {
             const now = new Date();
@@ -1792,7 +2068,7 @@ Historical Sales Log records will remain unchanged.`
             setTimeout(() => fetchFromGoogleSheet(false), 1200);
         };
 
-window.openModal = function (id) {
+        window.openModal = function (id) {
             const modal = document.getElementById(id);
             if (modal) {
                 modal.classList.add('active');
@@ -2314,12 +2590,12 @@ window.openModal = function (id) {
                             ${it.photo ? `<img src="${it.photo}" class="item-thumb" alt="${it.name}">` : `<span style="font-size:18px;">🍦</span>`}
                             <div>
                                 <div class="item-details-name">${it.name}</div>
-                                <div class="item-details-sub">${it.isComp ? '<strong style="color:var(--brand-gold);">FREE / COMP</strong>' : `$${it.price.toFixed(2)} each`}</div>
+                                <div class="item-details-sub">${it.isComp ? '<strong style="color:var(--brand-gold);">Free</strong>' : `$${it.price.toFixed(2)} each`}</div>
                             </div>
                         </div>
                         <div class="item-actions">
                             <button class="btn-comp-toggle ${it.isComp ? 'is-free' : ''}" onclick="toggleCartComp(${idx})">
-                                ${it.isComp ? '🎁 Free' : '$ Paid'}
+                                ${it.isComp ? '🎁 Free' : '💲 Paid'}
                             </button>
                             <div class="qty-stepper">
                                 <button class="qty-btn" onclick="changeCartQty(${idx}, -1)">-</button>
@@ -2375,10 +2651,10 @@ window.openModal = function (id) {
                         <td>$${f.price.toFixed(2)}</td>
                         <td><strong>${f.startingStock}</strong></td>
                         <td style="color:var(--brand-pink); font-weight:700;">${counts.sold}</td>
-                        <td style="color:var(--brand-gold); font-weight:700;">${counts.comp}</td>
+                        <td style="color:var(--success); font-weight:700;">${counts.comp}</td>
                         <td><span class="${inventoryStatus.inventoryClass}">${inventoryStatus.text}</span></td>
                         <td>
-                            <button class="btn-edit-outline" onclick="openEditFlavor('${f.id}')">✏️ Edit</button>
+                            <button class="btn-edit-outline" onclick="openEditFlavor('${f.id}')">✏️</button>
                             <button class="btn-danger-outline" onclick="deleteFlavor('${f.id}')">🗑️</button>
                         </td>
                     </tr>
@@ -2551,7 +2827,7 @@ window.openModal = function (id) {
             });
         }
 
-                // Cream Daddy Stats Venue Chip Picker V1
+        // Cream Daddy Stats Venue Chip Picker V1
         window.statsVenueFilterOptions = [];
 
         function renderVenueFilterChips() {
@@ -2669,7 +2945,7 @@ window.openModal = function (id) {
             }
         });
 
-function populateStatsVenueFilter() {
+        function populateStatsVenueFilter() {
             const venues = [...new Set(STATE.transactions.map(tx =>
                 String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue'
             ))].sort((a, b) => a.localeCompare(b));
@@ -2916,7 +3192,6 @@ function populateStatsVenueFilter() {
             } catch (e) {
                 encoded = encodeURIComponent(STATE.syncRoom);
             }
-
             const currentBase = window.location.href.split('?')[0].split('#')[0];
             const syncUrl = currentBase + '?shift=' + encoded;
 
@@ -3065,6 +3340,118 @@ function populateStatsVenueFilter() {
             // Background sync polling every 45s
             setInterval(() => fetchFromGoogleSheet(false), 45000);
         });
+
+        // Cream Daddy UI Polish V3
+        function uiV3NormalizeCartLabels() {
+            const root = document.getElementById('tab-register');
+            if (!root) return;
+
+            root.querySelectorAll('.btn-comp-toggle').forEach(button => {
+                const isFree = button.classList.contains('is-free');
+                button.textContent = isFree ? '🎁 Free' : '💲 Paid';
+            });
+
+            root.querySelectorAll('.item-details-sub').forEach(element => {
+                const text = element.textContent.replace(/\s+/g, ' ').trim();
+                if (/^free(?:\s*\/\s*comp)?$/i.test(text)) {
+                    element.textContent = 'Free';
+                    element.classList.add('free-item-text');
+                } else {
+                    element.classList.remove('free-item-text');
+                }
+            });
+
+            const freeCheckout = document.querySelector('#gift-actions .btn-checkout');
+            if (freeCheckout) freeCheckout.textContent = '🎁 Free';
+        }
+
+        function uiV3FormatReceiptDate(value) {
+            const raw = String(value || '').trim();
+            const parsed = new Date(raw);
+            if (Number.isNaN(parsed.getTime())) return raw;
+            const month = String(parsed.getMonth() + 1).padStart(2, '0');
+            const day = String(parsed.getDate()).padStart(2, '0');
+            const year = parsed.getFullYear();
+            const hours = String(parsed.getHours()).padStart(2, '0');
+            const minutes = String(parsed.getMinutes()).padStart(2, '0');
+            const seconds = String(parsed.getSeconds()).padStart(2, '0');
+            return `${month}/${day}/${year} • ${hours}:${minutes}:${seconds}`;
+        }
+
+        function uiV3ReceiptItems(tx) {
+            const items = Array.isArray(tx.items) ? tx.items : [];
+            if (items.length) {
+                return items.map(item => {
+                    const qty = Number(item.qty ?? item.quantity) || 0;
+                    return `${qty}× ${String(item.name || 'Item').trim()}${item.isComp ? ' [Free]' : ''}`;
+                }).join(', ');
+            }
+            return String(tx.summary || 'Items summary').replace(/\[FREE\]/gi, '[Free]');
+        }
+
+        function uiV3RenderReceiptLog() {
+            const log = document.getElementById('transactions-history-list');
+            if (!log) return;
+            const transactions = typeof getFilteredTransactions === 'function'
+                ? getFilteredTransactions()
+                : (STATE.transactions || []);
+            if (!transactions.length) {
+                log.innerHTML = '<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:12px;">No transactions match the selected filters.</div>';
+                return;
+            }
+
+            log.innerHTML = '';
+            transactions.forEach(tx => {
+                const row = document.createElement('div');
+                row.className = 'receipt-log-row';
+                const items = document.createElement('div');
+                items.className = 'receipt-log-items';
+                items.textContent = uiV3ReceiptItems(tx);
+                const total = document.createElement('div');
+                total.className = 'receipt-log-total';
+                total.textContent = `$${(Number(tx.totalPrice) || 0).toFixed(2)}`;
+                const time = document.createElement('div');
+                time.className = 'receipt-log-time';
+                time.textContent = uiV3FormatReceiptDate(tx.timestamp || tx.date);
+                const venue = document.createElement('div');
+                venue.className = 'receipt-log-venue';
+                venue.textContent = String(tx.venue || '');
+                row.append(items, total, time, venue);
+                log.appendChild(row);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            uiV3NormalizeCartLabels();
+            uiV3RenderReceiptLog();
+
+            const register = document.getElementById('tab-register');
+            if (register) {
+                let queued = false;
+                new MutationObserver(() => {
+                    if (queued) return;
+                    queued = true;
+                    requestAnimationFrame(() => {
+                        queued = false;
+                        uiV3NormalizeCartLabels();
+                    });
+                }).observe(register, { childList: true, subtree: true, characterData: true });
+            }
+
+            const receiptLog = document.getElementById('transactions-history-list');
+            if (receiptLog) {
+                let queued = false;
+                new MutationObserver(() => {
+                    if (queued || receiptLog.querySelector('.receipt-log-row')) return;
+                    queued = true;
+                    requestAnimationFrame(() => {
+                        queued = false;
+                        uiV3RenderReceiptLog();
+                    });
+                }).observe(receiptLog, { childList: true });
+            }
+        });
+
     </script>
 </body>
 
