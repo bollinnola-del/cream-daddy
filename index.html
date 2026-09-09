@@ -1348,6 +1348,38 @@
                 font-size: 11px;
             }
         }
+        /* Mobile Analytics Filters V2 */
+        #stats-filter-card { position: sticky; top: var(--app-header-height, 54px); z-index: 89; border: 2px solid var(--brand-pink); padding: 14px; }
+        .maf-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+        .maf-title { font-size:16px; font-weight:900; }
+        .maf-reset,.maf-filter-button { border:0; border-radius:999px; background:var(--brand-pink); color:#fff; padding:7px 14px; font-size:13px; font-weight:800; cursor:pointer; }
+        .maf-chip-row { display:flex; flex-wrap:wrap; align-items:center; gap:7px; padding:10px; min-height:52px; border:2px solid var(--brand-pink); border-radius:12px; background:#f3f4f6; }
+        .maf-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#fff; font-size:13px; font-weight:700; }
+        .maf-chip-remove { width:21px; height:21px; border:1px solid var(--brand-pink); border-radius:50%; padding:0; background:#fff; color:var(--brand-pink); font-size:16px; line-height:18px; cursor:pointer; }
+        #maf-modal { z-index:2200; padding:0; }
+        #maf-modal .maf-box { width:min(520px,100%); height:min(90vh,780px); max-height:90vh; padding:0; border-radius:16px 16px 0 0; display:flex; flex-direction:column; overflow:hidden; align-self:flex-end; background:#fff; }
+        .maf-body { flex:1; min-height:0; display:grid; grid-template-rows:minmax(150px,38%) minmax(270px,62%); overflow:hidden; }
+        .maf-section { min-height:0; overflow-y:auto; padding:18px; border-bottom:1px solid #ddd; }
+        .maf-section-title { font-size:20px; font-weight:900; margin-bottom:14px; }
+        .maf-venues { display:flex; flex-direction:column; gap:12px; }
+        .maf-venue { display:flex; align-items:center; gap:12px; font-size:16px; padding:5px 0; }
+        .maf-venue input { width:22px; height:22px; accent-color:var(--brand-pink); }
+        .maf-calendar-toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+        .maf-calendar-toolbar button { border:0; border-radius:8px; background:#f3f4f6; padding:8px 12px; font-weight:900; }
+        .maf-calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center; }
+        .maf-weekday { padding:5px 0; color:var(--text-muted); font-size:11px; font-weight:800; }
+        .maf-day { min-height:38px; border:0; border-radius:50%; background:transparent; font-weight:700; }
+        .maf-day.in-range { border-radius:8px; background:#fde7f3; }
+        .maf-day.endpoint { background:var(--brand-pink); color:#fff; }
+        .maf-day.blank { visibility:hidden; }
+        .maf-date-help { margin-top:10px; color:var(--text-muted); font-size:12px; text-align:center; }
+        .maf-footer { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; padding:12px 16px calc(12px + env(safe-area-inset-bottom)); box-shadow:0 -3px 12px rgba(0,0,0,.08); }
+        .maf-footer button { min-height:46px; border-radius:10px; font-weight:900; }
+        .maf-clear { border:1px solid var(--danger); color:var(--danger); background:#fff; }
+        .maf-cancel { border:1px solid var(--border-color); background:#f3f4f6; }
+        .maf-apply { border:0; color:#fff; background:var(--brand-pink); }
+        @media(min-width:561px){ #maf-modal{align-items:center;padding:16px} #maf-modal .maf-box{align-self:center;border-radius:16px} }
+
     </style>
 </head>
 
@@ -3478,7 +3510,48 @@ Historical Sales Log records will remain unchanged.`
             }
         });
 
-    </script>
+        // Mobile Analytics Filters V2
+        let mafDraft = null;
+        let mafMonth = new Date();
+        function mafActive(){ return (statsFilters.selectedVenues || []).length > 0 || statsFilters.mode !== 'ALL_TIME'; }
+        function mafFmt(v){ if(!v)return ''; const p=v.split('-').map(Number); return new Date(p[0],p[1]-1,p[2]).toLocaleDateString([],{month:'numeric',day:'numeric',year:'2-digit'}); }
+        function mafRenderCard(){
+            const card=document.getElementById('stats-filter-card'); if(!card)return;
+            card.innerHTML=`<div class="maf-header"><div class="maf-title">🔎 Analytics Filters</div>${mafActive()?'<button class="maf-reset" type="button" onclick="mafReset()">Reset</button>':''}</div><div class="maf-chip-row"><button class="maf-filter-button" type="button" onclick="mafOpen()">Filter</button><span id="maf-chips" style="display:contents"></span></div>`;
+            const box=card.querySelector('#maf-chips');
+            (statsFilters.selectedVenues||[]).forEach(v=>mafAddChip(box,v,()=>mafRemoveVenue(v)));
+            if(statsFilters.mode==='SINGLE_DATE') mafAddChip(box,mafFmt(statsFilters.singleDate),mafRemoveDate);
+            if(statsFilters.mode==='CUSTOM_RANGE') mafAddChip(box,`${mafFmt(statsFilters.startDate)} - ${mafFmt(statsFilters.endDate)}`,mafRemoveDate);
+        }
+        function mafAddChip(box,label,fn){ const c=document.createElement('span'); c.className='maf-chip'; const b=document.createElement('button'); b.type='button'; b.className='maf-chip-remove'; b.textContent='×'; b.onclick=fn; c.append(b,document.createTextNode(label)); box.append(c); }
+        function mafCommit(){ saveStatsFilters(); mafRenderCard(); renderStats(); }
+        function mafRemoveVenue(v){ statsFilters.selectedVenues=(statsFilters.selectedVenues||[]).filter(x=>x!==v); mafCommit(); }
+        function mafRemoveDate(){ Object.assign(statsFilters,{mode:'ALL_TIME',singleDate:'',startDate:'',endDate:''}); mafCommit(); }
+        function mafReset(){ statsFilters={selectedVenues:[],mode:'ALL_TIME',singleDate:'',startDate:'',endDate:''}; mafCommit(); }
+        function mafOpen(){ mafDraft=JSON.parse(JSON.stringify(statsFilters)); const seed=mafDraft.singleDate||mafDraft.startDate||localTodayDate(); const p=seed.split('-').map(Number); mafMonth=new Date(p[0],p[1]-1,1); mafRenderVenues(); mafRenderCalendar(); document.getElementById('maf-modal').classList.add('active'); }
+        function mafClose(){ document.getElementById('maf-modal').classList.remove('active'); }
+        function mafCancel(){ mafDraft=null; mafClose(); }
+        function mafClearDraft(){ mafDraft={selectedVenues:[],mode:'ALL_TIME',singleDate:'',startDate:'',endDate:''}; mafRenderVenues(); mafRenderCalendar(); }
+        function mafApply(){ if(mafDraft) statsFilters=mafDraft; mafDraft=null; mafCommit(); mafClose(); }
+        function mafRenderVenues(){ const box=document.getElementById('maf-venues'); const venues=[...(window.statsVenueFilterOptions||[])].sort((a,b)=>a.localeCompare(b)); box.innerHTML=''; venues.forEach(v=>{ const label=document.createElement('label'); label.className='maf-venue'; const input=document.createElement('input'); input.type='checkbox'; input.checked=(mafDraft.selectedVenues||[]).includes(v); input.onchange=()=>{ const s=new Set(mafDraft.selectedVenues||[]); input.checked?s.add(v):s.delete(v); mafDraft.selectedVenues=[...s]; }; label.append(input,document.createTextNode(v)); box.append(label); }); if(!venues.length)box.textContent='No venues available.'; }
+        function mafMoveMonth(n){ mafMonth=new Date(mafMonth.getFullYear(),mafMonth.getMonth()+n,1); mafRenderCalendar(); }
+        function mafIso(y,m,d){ return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+        function mafSelectDay(iso){ if(mafDraft.mode==='ALL_TIME'||mafDraft.mode==='CUSTOM_RANGE'){ Object.assign(mafDraft,{mode:'SINGLE_DATE',singleDate:iso,startDate:'',endDate:''}); } else { const a=mafDraft.singleDate; if(a===iso) Object.assign(mafDraft,{mode:'ALL_TIME',singleDate:''}); else Object.assign(mafDraft,{mode:'CUSTOM_RANGE',singleDate:'',startDate:a<iso?a:iso,endDate:a<iso?iso:a}); } mafRenderCalendar(); }
+        function mafRenderCalendar(){ const grid=document.getElementById('maf-calendar'); grid.innerHTML=''; ['S','M','T','W','T','F','S'].forEach(x=>{const e=document.createElement('div');e.className='maf-weekday';e.textContent=x;grid.append(e)}); const y=mafMonth.getFullYear(),m=mafMonth.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(); document.getElementById('maf-month-label').textContent=mafMonth.toLocaleDateString([],{month:'long',year:'numeric'}); for(let i=0;i<first;i++){const b=document.createElement('button');b.className='maf-day blank';grid.append(b)} for(let d=1;d<=days;d++){const iso=mafIso(y,m,d),b=document.createElement('button');b.type='button';b.className='maf-day';b.textContent=d;b.onclick=()=>mafSelectDay(iso);const s=mafDraft.mode==='SINGLE_DATE'?mafDraft.singleDate:mafDraft.startDate,e=mafDraft.mode==='CUSTOM_RANGE'?mafDraft.endDate:s;if(s&&e&&iso>=s&&iso<=e)b.classList.add('in-range');if(iso===s||iso===e)b.classList.add('endpoint');grid.append(b)} document.getElementById('maf-date-help').textContent=mafDraft.mode==='SINGLE_DATE'?`Start: ${mafFmt(mafDraft.singleDate)} — tap another day for a range.`:mafDraft.mode==='CUSTOM_RANGE'?`${mafFmt(mafDraft.startDate)} - ${mafFmt(mafDraft.endDate)}`:'Tap one day for a date or two days for a range.'; }
+        window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ populateStatsVenueFilter(); mafRenderCard(); },0));
+
+</script>
+
+    <div id="maf-modal" class="modal-overlay" role="dialog" aria-modal="true">
+      <div class="maf-box">
+        <div class="maf-body">
+          <section class="maf-section"><div class="maf-section-title">📍 Venues</div><div id="maf-venues" class="maf-venues"></div></section>
+          <section class="maf-section"><div class="maf-section-title">📅 Dates</div><div class="maf-calendar-toolbar"><button type="button" onclick="mafMoveMonth(-1)">‹</button><b id="maf-month-label"></b><button type="button" onclick="mafMoveMonth(1)">›</button></div><div id="maf-calendar" class="maf-calendar"></div><div id="maf-date-help" class="maf-date-help"></div></section>
+        </div>
+        <footer class="maf-footer"><button class="maf-clear" type="button" onclick="mafClearDraft()">Clear</button><button class="maf-cancel" type="button" onclick="mafCancel()">Cancel</button><button class="maf-apply" type="button" onclick="mafApply()">Apply</button></footer>
+      </div>
+    </div>
+
 </body>
 
 </html>
