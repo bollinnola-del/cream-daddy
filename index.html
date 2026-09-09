@@ -1458,7 +1458,7 @@
     <div id="tab-inventory" class="tab-content">
         <div class="card">
             <div class="card-header-row">
-                <div class="card-title">Pint Inventory & Menu</div>
+                <div class="card-title">Unit Inventory & Menu</div>
                 <button class="btn-primary" onclick="openModal('flavor-modal')">+ Add Flavor</button>
             </div>
             <div style="overflow-x: auto;">
@@ -1555,11 +1555,11 @@
                 <div class="stat-val" id="stat-revenue">$0.00</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Pints Sold</div>
+                <div class="stat-label">Units Sold</div>
                 <div class="stat-val" id="stat-sold">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Pints Free/Comp</div>
+                <div class="stat-label">Units Free/Comp</div>
                 <div class="stat-val" id="stat-comp">0</div>
             </div>
             <div class="stat-card">
@@ -1890,7 +1890,10 @@
                     }));
                 }
                 if (Array.isArray(data.transactions)) {
-                    STATE.transactions = data.transactions;
+                    STATE.transactions = data.transactions.map(tx => ({
+                        ...tx,
+                        paymentMethod: String(tx.paymentMethod || tx.payment || 'unknown').toLowerCase()
+                    }));
                 }
                 if (Array.isArray(data.venues)) {
                     STATE.venues = data.venues;
@@ -2583,7 +2586,12 @@ Historical Sales Log records will remain unchanged.`
                     </div>
                 `;
             } else {
-                grid.innerHTML = STATE.flavors.map(f => {
+                const registerFlavors = [...STATE.flavors].sort((a, b) => {
+                    const aSoldOut = getFlavorStockRemaining(a) <= 0;
+                    const bSoldOut = getFlavorStockRemaining(b) <= 0;
+                    return Number(aSoldOut) - Number(bSoldOut);
+                });
+                grid.innerHTML = registerFlavors.map(f => {
                     const remaining = getFlavorStockRemaining(f);
                     const isOut = remaining <= 0;
                     return `
@@ -3037,7 +3045,7 @@ Historical Sales Log records will remain unchanged.`
             if (!container) return;
 
             const venues = {};
-            STATE.transactions.forEach(tx => {
+            getFilteredTransactions().forEach(tx => {
                 const venue = String(tx.venue || 'Unspecified Venue').trim() || 'Unspecified Venue';
                 if (!venues[venue]) {
                     venues[venue] = { revenue: 0, sold: 0, gifted: 0, transactions: 0 };
@@ -3086,27 +3094,28 @@ Historical Sales Log records will remain unchanged.`
             let totalRevenue = 0;
             let totalSold = 0;
             let totalComp = 0;
+            const filteredTransactions = getFilteredTransactions();
 
-            STATE.transactions.forEach(tx => {
-                totalRevenue += (tx.totalPrice || 0);
-                totalSold += (tx.totalUnitsSold || 0);
-                totalComp += (tx.totalUnitsGiven || 0);
+            filteredTransactions.forEach(tx => {
+                totalRevenue += Number(tx.totalPrice) || 0;
+                totalSold += Number(tx.totalUnitsSold) || 0;
+                totalComp += Number(tx.totalUnitsGiven) || 0;
             });
 
             document.getElementById('stat-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
             document.getElementById('stat-sold').textContent = totalSold;
             document.getElementById('stat-comp').textContent = totalComp;
-            document.getElementById('stat-txs').textContent = STATE.transactions.length;
+            document.getElementById('stat-txs').textContent = filteredTransactions.length;
 
             const log = document.getElementById('transactions-history-list');
             if (!log) return;
 
-            if (STATE.transactions.length === 0) {
+            if (filteredTransactions.length === 0) {
                 log.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center; padding:12px;">No transactions logged for this shift yet.</div>';
                 return;
             }
 
-            log.innerHTML = STATE.transactions.map(tx => {
+            log.innerHTML = filteredTransactions.map(tx => {
                 const itemSummary = (tx.items || []).map(it => `${it.qty}x ${it.name} ${it.isComp ? '[FREE]' : ''}`).join(', ') || tx.summary || 'Items summary';
                 return `
                     <div style="border-bottom:1px solid var(--border-color); padding:8px 0; font-size:12px;">
@@ -3134,8 +3143,8 @@ Historical Sales Log records will remain unchanged.`
             docText += `Venue: ${STATE.venue}\nDate: ${STATE.date}\n`;
             docText += `----------------------------------------\n`;
             docText += `Gross Sales: $${rev.toFixed(2)}\n`;
-            docText += `Paid Pints Sold: ${sold}\n`;
-            docText += `Free / Promotional Pints: ${comp}\n`;
+            docText += `Paid Units Sold: ${sold}\n`;
+            docText += `Free / Promotional Units: ${comp}\n`;
             docText += `Total Containers Out: ${sold + comp}\n\n`;
             docText += `INVENTORY BREAKDOWN:\n`;
             STATE.flavors.forEach(f => {
@@ -3152,10 +3161,10 @@ Historical Sales Log records will remain unchanged.`
         };
 
         window.exportCSV = function () {
-            let csv = "Timestamp,Venue,Date,OrderTotal,PaidUnits,FreeUnits,ItemsSummary\n";
+            let csv = "Timestamp,Venue,Date,PaymentMethod,OrderTotal,PaidUnits,FreeUnits,ItemsSummary\n";
             STATE.transactions.forEach(t => {
                 const summary = (t.items || []).map(i => `${i.qty}x ${i.name}${i.isComp ? ' (FREE)' : ''}`).join('; ') || t.summary || '';
-                csv += `"${t.timestamp || ''}","${t.venue || ''}","${t.date || ''}",${t.totalPrice || 0},${t.totalUnitsSold || 0},${t.totalUnitsGiven || 0},"${summary}"\n`;
+                csv += `"${t.timestamp || ''}","${t.venue || ''}","${t.date || ''}","${t.paymentMethod || 'unknown'}",${t.totalPrice || 0},${t.totalUnitsSold || 0},${t.totalUnitsGiven || 0},"${summary}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -3431,7 +3440,8 @@ Historical Sales Log records will remain unchanged.`
                 time.textContent = uiV3FormatReceiptDate(tx.timestamp || tx.date);
                 const venue = document.createElement('div');
                 venue.className = 'receipt-log-venue';
-                venue.textContent = String(tx.venue || '');
+                const paymentLabel = ({ cash: 'Cash', card: 'Card', gift: 'Free' })[String(tx.paymentMethod || '').toLowerCase()] || 'Unknown';
+                venue.textContent = `${String(tx.venue || '')} • ${paymentLabel}`;
                 row.append(items, total, time, venue);
                 log.appendChild(row);
             });
