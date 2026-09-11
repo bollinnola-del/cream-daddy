@@ -1352,7 +1352,10 @@
         .maf-apply { border:0; color:#fff; background:var(--brand-pink); }
         @media(min-width:561px){ #maf-modal{align-items:center;padding:16px} #maf-modal .maf-box{align-self:center;border-radius:16px} }
 
-    </style>
+    /* Venue Session + Persistent Card Checkout V1 */
+#venue-required-card{display:none;text-align:center;padding:24px 18px}.venue-required-icon{font-size:34px;margin-bottom:10px}.venue-required-title{font-size:20px;font-weight:900;margin-bottom:8px}.venue-required-copy{color:var(--text-muted);font-size:13px;margin-bottom:16px}.venue-required-button{width:100%;max-width:320px}.shift-bar.venue-hidden{display:none!important}
+
+</style>
     <!-- Cream Daddy PWA -->
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#fabc15">
@@ -1396,6 +1399,7 @@
     </div>
 
     <div id="tab-register" class="tab-content active">
+<div id="venue-required-card" class="cart-section"><div class="venue-required-icon">📍</div><div class="venue-required-title">Select Today's Venue</div><div class="venue-required-copy">Choose a venue before starting an order.</div><button class="btn-primary venue-required-button" onclick="openModal('venue-modal')">Select Today's Venue</button></div>
         <div class="cart-section">
             <div class="cart-header">
                 <div class="cart-title">🛒 Current Order</div>
@@ -1768,7 +1772,7 @@
         const HARDCODED_WEBHOOK = "https://script.google.com/macros/s/AKfycbxgCmXizdbMFcxaWJQbo0kX29JGy5Lhq-sccW7orquhq1zHYbo1hCI3XOtQ1x2BvUjt/exec";
 
         const STATE = {
-            venue: "Daily Pop-Up",
+            venue: "",
             date: new Date().toISOString().split('T')[0],
             savedVenues: [],
             flavors: [],
@@ -3513,6 +3517,49 @@ Historical Sales Log records will remain unchanged.`
         function mafSelectDay(iso){ if(mafDraft.mode==='ALL_TIME'||mafDraft.mode==='CUSTOM_RANGE'){ Object.assign(mafDraft,{mode:'SINGLE_DATE',singleDate:iso,startDate:'',endDate:''}); } else { const a=mafDraft.singleDate; if(a===iso) Object.assign(mafDraft,{mode:'ALL_TIME',singleDate:''}); else Object.assign(mafDraft,{mode:'CUSTOM_RANGE',singleDate:'',startDate:a<iso?a:iso,endDate:a<iso?iso:a}); } mafRenderCalendar(); }
         function mafRenderCalendar(){ const grid=document.getElementById('maf-calendar'); grid.innerHTML=''; ['S','M','T','W','T','F','S'].forEach(x=>{const e=document.createElement('div');e.className='maf-weekday';e.textContent=x;grid.append(e)}); const y=mafMonth.getFullYear(),m=mafMonth.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(); document.getElementById('maf-month-label').textContent=mafMonth.toLocaleDateString([],{month:'long',year:'numeric'}); for(let i=0;i<first;i++){const b=document.createElement('button');b.className='maf-day blank';grid.append(b)} for(let d=1;d<=days;d++){const iso=mafIso(y,m,d),b=document.createElement('button');b.type='button';b.className='maf-day';b.textContent=d;b.onclick=()=>mafSelectDay(iso);const s=mafDraft.mode==='SINGLE_DATE'?mafDraft.singleDate:mafDraft.startDate,e=mafDraft.mode==='CUSTOM_RANGE'?mafDraft.endDate:s;if(s&&e&&iso>=s&&iso<=e)b.classList.add('in-range');if(iso===s||iso===e)b.classList.add('endpoint');grid.append(b)} document.getElementById('maf-date-help').textContent=mafDraft.mode==='SINGLE_DATE'?`Start: ${mafFmt(mafDraft.singleDate)} — tap another day for a range.`:mafDraft.mode==='CUSTOM_RANGE'?`${mafFmt(mafDraft.startDate)} - ${mafFmt(mafDraft.endDate)}`:'Tap one day for a date or two days for a range.'; }
         window.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ populateStatsVenueFilter(); mafRenderCard(); },0));
+
+// Venue Session + Persistent Card Checkout V1
+(function(){
+ const VENUE_SESSION_KEY='cream_daddy_active_venue_session_v1';
+ const PAYMENT_PENDING_KEY='cream_daddy_card_payment_pending_v1';
+ function cleanVenue(v){v=String(v||'').trim();return v.toLowerCase()==='daily pop-up'?'':v}
+ function sessionVenue(){return cleanVenue(sessionStorage.getItem(VENUE_SESSION_KEY))}
+ function paymentPending(){return sessionStorage.getItem(PAYMENT_PENDING_KEY)==='1'}
+ function setPaymentPending(on){if(on)sessionStorage.setItem(PAYMENT_PENDING_KEY,'1');else sessionStorage.removeItem(PAYMENT_PENDING_KEY)}
+ function applyVenueGate(){
+   const venue=cleanVenue(STATE.venue)||sessionVenue();
+   STATE.venue=venue;
+   if(venue)sessionStorage.setItem(VENUE_SESSION_KEY,venue);else sessionStorage.removeItem(VENUE_SESSION_KEY);
+   const shift=document.querySelector('.shift-bar'), order=document.querySelector('#tab-register .cart-section:not(#venue-required-card)'), required=document.getElementById('venue-required-card'), grid=document.getElementById('register-flavors-grid');
+   if(shift)shift.classList.toggle('venue-hidden',!venue);
+   if(order)order.style.display=venue?'':'none';
+   if(required)required.style.display=venue?'none':'block';
+   if(grid)grid.style.display=venue?'':'none';
+ }
+ function applyPendingPayment(){
+   const pending=paymentPending(), normal=document.getElementById('checkout-actions'), gift=document.getElementById('gift-actions'), actions=document.getElementById('venmo-pending-actions');
+   if(!actions)return;
+   if(pending){if(normal)normal.style.display='none';if(gift)gift.style.display='none';actions.style.display='grid'}
+ }
+ function reconcile(){applyVenueGate();applyPendingPayment()}
+ const originalRenderRegister=window.renderRegister||renderRegister;
+ window.renderRegister=function(){originalRenderRegister();reconcile()};
+ const originalSaveVenue=window.saveVenue;
+ window.saveVenue=async function(){await originalSaveVenue.apply(this,arguments);const v=cleanVenue(STATE.venue);if(v)sessionStorage.setItem(VENUE_SESSION_KEY,v);reconcile();renderRegister()};
+ const originalSelectSavedVenue=window.selectSavedVenue;
+ if(originalSelectSavedVenue)window.selectSavedVenue=function(v){v=cleanVenue(v);if(!v)return;originalSelectSavedVenue(v);sessionStorage.setItem(VENUE_SESSION_KEY,v);reconcile();renderRegister()};
+ const originalStart=window.startVenmoTransaction;
+ window.startVenmoTransaction=async function(){setPaymentPending(true);applyPendingPayment();try{return await originalStart.apply(this,arguments)}finally{applyPendingPayment()}};
+ const originalConfirm=window.confirmVenmoPayment;
+ window.confirmVenmoPayment=function(){setPaymentPending(false);return originalConfirm.apply(this,arguments)};
+ const originalCancel=window.cancelVenmoPayment;
+ window.cancelVenmoPayment=function(){setPaymentPending(false);return originalCancel.apply(this,arguments)};
+ const originalSync=window.handleGoogleSheetSyncResponse;
+ window.handleGoogleSheetSyncResponse=function(data){const v=sessionVenue(),pending=paymentPending();const result=originalSync(data);STATE.venue=v;if(pending)setPaymentPending(true);reconcile();return result};
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)reconcile()});
+ window.addEventListener('pageshow',reconcile);
+ document.addEventListener('DOMContentLoaded',()=>{STATE.venue=sessionVenue();STATE.venues=(STATE.venues||[]).filter(v=>cleanVenue(v));setTimeout(()=>{reconcile();renderRegister()},0)});
+})();
 
 </script>
 
