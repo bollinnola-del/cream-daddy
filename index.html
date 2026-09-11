@@ -565,7 +565,7 @@
         }
 
         .stat-val {
-            font-size: 22px;
+            font-size: 14px;
             font-weight: 900;
             color: var(--brand-pink);
             margin-top: 4px;
@@ -1516,7 +1516,6 @@
                             <th>Start</th>
                             <th>Sold</th>
                             <th>Free</th>
-                            <th>Left</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -1605,7 +1604,7 @@
                 <div class="stat-val" id="stat-sold">0</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Units Free/Comp</div>
+                <div class="stat-label">Units Free</div>
                 <div class="stat-val" id="stat-comp">0</div>
             </div>
             <div class="stat-card">
@@ -1806,26 +1805,29 @@
             scriptUrl: HARDCODED_WEBHOOK,
             tempPhotoBase64: "",
             isSyncing: false
-        }; function haptic(type = 'light') {
+        };
+
+        let lastHapticAt = 0;
+        function haptic(type = 'light') {
+            const now = Date.now();
+            const throttleMs = type === 'error' ? 180 : 60;
+            if (now - lastHapticAt < throttleMs) return;
+            lastHapticAt = now;
 
             if (!navigator.vibrate) return;
 
             switch (type) {
-
                 case 'light':
-                    navigator.vibrate(15);
+                    navigator.vibrate(18);
                     break;
-
                 case 'medium':
-                    navigator.vibrate(40);
+                    navigator.vibrate([18, 20, 36]);
                     break;
-
                 case 'success':
-                    navigator.vibrate([40, 30, 80]);
+                    navigator.vibrate([30, 25, 55, 25, 90]);
                     break;
-
                 case 'error':
-                    navigator.vibrate([100, 50, 100]);
+                    navigator.vibrate([90, 35, 130]);
                     break;
             }
         }
@@ -2695,7 +2697,9 @@ Historical Sales Log records will remain unchanged.`
             });
 
             document.getElementById('cart-paid-units').textContent = paidUnits;
-            document.getElementById('cart-comp-units').textContent = compUnits;
+            const cartCompUnits = document.getElementById('cart-comp-units');
+            cartCompUnits.textContent = compUnits;
+            cartCompUnits.style.color = 'var(--success)';
             document.getElementById('cart-total-price').textContent = `$${totalDollars.toFixed(2)}`;
             showNormalCheckoutButtons();
         }
@@ -2725,8 +2729,7 @@ Historical Sales Log records will remain unchanged.`
                         <td>$${f.price.toFixed(2)}</td>
                         <td><strong>${f.startingStock}</strong></td>
                         <td style="color:var(--brand-pink); font-weight:700;">${counts.sold}</td>
-                        <td style="color:var(--brand-gold); font-weight:700;">${counts.comp}</td>
-                        <td><strong style="${left <= 3 ? 'color:var(--danger);' : ''}">${left}</strong></td>
+                        <td style="color:var(--success); font-weight:700;">${counts.comp}</td>
                         <td>
                             <button class="btn-edit-outline" onclick="openEditFlavor('${f.id}')">✏️</button>
                             <button class="btn-danger-outline" onclick="deleteFlavor('${f.id}')">🗑️</button>
@@ -3150,7 +3153,9 @@ Historical Sales Log records will remain unchanged.`
 
             document.getElementById('stat-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
             document.getElementById('stat-sold').textContent = totalSold;
-            document.getElementById('stat-comp').textContent = totalComp;
+            const statsComp = document.getElementById('stat-comp');
+            statsComp.textContent = totalComp;
+            statsComp.style.color = 'var(--brand-pink)';
             document.getElementById('stat-txs').textContent = filteredTransactions.length;
 
             const log = document.getElementById('transactions-history-list');
@@ -3370,16 +3375,27 @@ Historical Sales Log records will remain unchanged.`
                 authorizeHelper();
             }
         });
-        document.addEventListener('click', (e) => {
+        document.addEventListener('pointerdown', (e) => {
+            const target = e.target;
+            if (!(target instanceof Element)) return;
 
-            if (
-                e.target.tagName === 'BUTTON' ||
-                e.target.closest('.flavor-card')
-            ) {
-                haptic('light');
+            const interactive = target.closest('button, .flavor-card, .nav-item, .qty-btn, .btn-comp-toggle');
+            if (!interactive) return;
+
+            if (interactive.matches('.qty-btn, .btn-comp-toggle')) {
+                haptic('medium');
+                return;
             }
 
-        }); window.addEventListener('DOMContentLoaded', () => {
+            if (interactive.matches('.flavor-card, .nav-item')) {
+                haptic('medium');
+                return;
+            }
+
+            haptic('light');
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
             loadSavedState();
             checkForIncomingSyncPayload();
             renderAll();
