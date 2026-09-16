@@ -11,6 +11,7 @@
     <title>Cream Daddy Sales</title>
     <link rel="manifest"
         href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Cream%20Daddy%20Sales%22%2C%22short_name%22%3A%22CreamDaddy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fabc15%22%2C%22theme_color%22%3A%22%23fabc15%22%7D">
+    <link rel="stylesheet" href="https://use.typekit.net/efi8wqk.css">
     <style>
         :root {
             --brand-pink: #e83393;
@@ -454,9 +455,13 @@
         }
 
         .card-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: var(--brand-black);
+            font-size: 22px;
+            font-weight: 400;
+            color: var(--brand-pink);
+            font-family: "barricada-pro", serif;
+            font-synthesis: none;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
         .btn-primary {
@@ -723,6 +728,11 @@
         .access-card h1 {
             font-size: 22px;
             margin-bottom: 8px;
+            font-family: "barricada-pro", serif;
+            font-weight: 400;
+            font-synthesis: none;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
         }
 
         .access-card p {
@@ -743,6 +753,10 @@
             color: var(--danger);
             font-size: 13px;
             margin-top: 8px;
+        }
+
+        #access-error:empty {
+            display: none;
         }
 
         .venue-report-row {
@@ -1351,7 +1365,7 @@
         /* Mobile Analytics Filters V2 */
         #stats-filter-card { position: sticky; top: var(--app-header-height, 54px); z-index: 89; border: 2px solid var(--brand-pink); padding: 14px; }
         .maf-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
-        .maf-title { font-size:16px; font-weight:900; }
+        .maf-title { font-size:22px; font-weight:400; color:var(--brand-pink); font-family:"barricada-pro",serif; font-synthesis:none; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
         .maf-reset,.maf-filter-button { border:0; border-radius:999px; background:var(--brand-pink); color:#fff; padding:7px 14px; font-size:13px; font-weight:800; cursor:pointer; }
         .maf-chip-row { display:flex; flex-wrap:wrap; align-items:center; gap:7px; padding:10px; min-height:52px; border:2px solid var(--brand-pink); border-radius:12px; background:#f3f4f6; }
         .maf-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#fff; font-size:13px; font-weight:700; }
@@ -1399,7 +1413,7 @@
 <body>
     <div id="access-lock" class="active" aria-modal="true" role="dialog">
         <div class="access-card">
-            <img src="assets/icons/icon-32.png" alt="Cream Daddy" style="width:42px;height:42px;margin-bottom:8px;border-radius:12px;object-fit:cover;">
+            <img src="assets/icons/icon-180.png" alt="Cream Daddy" style="width:42px;height:42px;margin-bottom:8px;border-radius:12px;object-fit:cover;">
             <h1>Cream Daddy Team Access</h1>
             <input id="helper-access-code" class="form-input" type="password" autocomplete="current-password"
                 placeholder="Access code">
@@ -1429,7 +1443,7 @@
 <div id="venue-required-card" class="cart-section"><div class="venue-required-icon">📍</div><div class="venue-required-title">Select Today's Venue</div><div class="venue-required-copy">Choose a venue before starting an order.</div><button class="btn-primary venue-required-button" onclick="openModal('venue-modal')">Select Today's Venue</button></div>
         <div class="cart-section">
             <div class="cart-header">
-                <div class="cart-title">🛒 Current Order</div>
+                <div class="cart-title card-title">🛒 Current Order</div>
                 <button class="btn-clear-cart" onclick="clearCart()">Clear Cart</button>
             </div>
             <div id="cart-list" class="cart-items-list"></div>
@@ -3617,7 +3631,7 @@ Historical Sales Log records will remain unchanged.`
         function mafFmt(v){ if(!v)return ''; const p=v.split('-').map(Number); return new Date(p[0],p[1]-1,p[2]).toLocaleDateString([],{month:'numeric',day:'numeric',year:'2-digit'}); }
         function mafRenderCard(){
             const card=document.getElementById('stats-filter-card'); if(!card)return;
-            card.innerHTML=`<div class="maf-header"><div class="maf-title">🔎 Analytics Filters</div>${mafActive()?'<button class="maf-reset" type="button" onclick="mafReset()">Reset</button>':''}</div><div class="maf-chip-row"><button class="maf-filter-button" type="button" onclick="mafOpen()">Filter</button><span id="maf-chips" style="display:contents"></span></div>`;
+            card.innerHTML=`<div class="maf-header"><div class="maf-title card-title">🔎 Analytics Filters</div>${mafActive()?'<button class="maf-reset" type="button" onclick="mafReset()">Reset</button>':''}</div><div class="maf-chip-row"><button class="maf-filter-button" type="button" onclick="mafOpen()">Filter</button><span id="maf-chips" style="display:contents"></span></div>`;
             const box=card.querySelector('#maf-chips');
             (statsFilters.selectedVenues||[]).forEach(v=>mafAddChip(box,v,()=>mafRemoveVenue(v)));
             if(statsFilters.mode==='SINGLE_DATE') mafAddChip(box,mafFmt(statsFilters.singleDate),mafRemoveDate);
