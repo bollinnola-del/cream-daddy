@@ -2,15 +2,15 @@
  * Cream Daddy Google Sheets API
  * Sheets created/used:
  *   Menu & Inventory: Product ID | Product Name | Price | Current Stock | Photo URL / Base64 | Updated At
- *   Sales Log: Timestamp | Venue | Business Date | Net Total | Units Sold | Units Gifted | Summary | Items JSON | Transaction ID
+ *   Sales Log: Timestamp | Venue | Business Date | Net Total | Units Sold | Units Gifted | Summary | Items JSON | Transaction ID | Payment Method
+ *   Venues: Venue | Updated At
  *
- * Deploy as a Web app. For phones that are not signed into the script owner's Google account,
- * execute as the owner and grant access according to the deployment's intended audience.
+ * Payment Method is appended as column 10 so existing Sales Log data and
+ * Transaction ID references remain compatible. Existing rows default to Unknown.
  */
 var MENU_SHEET = 'Menu & Inventory';
 var SALES_SHEET = 'Sales Log';
 var VENUES_SHEET = 'Venues';
-// Cream Daddy Shared Venue Catalog V1
 
 function doGet(e) {
   try {
@@ -40,15 +40,11 @@ function doPost(e) {
   }
 }
 
-
-
 // ---- 24-hour shared helper authorization ----
 function authorizeHelper_(providedCode) {
   var secret = PropertiesService.getScriptProperties().getProperty('HELPER_ACCESS_CODE');
   if (!secret) throw new Error('HELPER_ACCESS_CODE is not configured.');
-  if (!providedCode || String(providedCode) !== String(secret)) {
-    throw new Error('Incorrect access code.');
-  }
+  if (!providedCode || String(providedCode) !== String(secret)) throw new Error('Incorrect access code.');
   var expiresAt = Date.now() + (24 * 60 * 60 * 1000);
   return {status:'success', token:createAccessToken_(expiresAt), expiresAt:expiresAt};
 }
@@ -111,12 +107,27 @@ function processWrite_(data) {
 }
 
 function pullAll_() {
+  var startTime = Date.now();
+
   var sheets = ensureSheets_();
+
+  Logger.log(
+    'After ensureSheets_: ' +
+    (Date.now() - startTime) +
+    ' ms'
+  );
+
   var flavors = [];
+
   if (sheets.menu.getLastRow() > 1) {
-    var rows = sheets.menu.getRange(2,1,sheets.menu.getLastRow()-1,6).getValues();
+    var rows =
+      sheets.menu
+      .getRange(2,1,sheets.menu.getLastRow()-1,6)
+      .getValues();
+
     rows.forEach(function(row, idx) {
       if (!row[1]) return;
+
       flavors.push({
         id: String(row[0] || ('flv_' + (idx + 1))),
         name: String(row[1]).trim(),
@@ -128,13 +139,30 @@ function pullAll_() {
     });
   }
 
+  Logger.log(
+    'After flavors: ' +
+    (Date.now() - startTime) +
+    ' ms'
+  );
+
   var transactions = [];
+
   if (sheets.sales.getLastRow() > 1) {
-    var salesRows = sheets.sales.getRange(2,1,sheets.sales.getLastRow()-1,9).getValues();
+    var salesRows =
+      sheets.sales
+      .getRange(2,1,sheets.sales.getLastRow()-1,10)
+      .getValues();
+
     salesRows.forEach(function(row, idx) {
+
       if (!row[0] && !row[8]) return;
+
       var items = parseItemsJson_(row[7]);
-      if (!items.length) items = parseItemsFromSummary_(row[6]);
+
+      if (!items.length) {
+        items = parseItemsFromSummary_(row[6]);
+      }
+
       transactions.push({
         id: String(row[8] || ('tx_sheet_' + (idx + 1))),
         timestamp: isoOrString_(row[0]),
@@ -144,26 +172,57 @@ function pullAll_() {
         totalUnitsSold: number_(row[4]),
         totalUnitsGiven: number_(row[5]),
         summary: String(row[6] || ''),
-        items: items
+        items: items,
+        paymentMethod: normalizePaymentMethod_(
+          row[9],
+          number_(row[3]),
+          number_(row[4]),
+          number_(row[5])
+        )
       });
     });
   }
+
+  Logger.log(
+    'After transactions: ' +
+    (Date.now() - startTime) +
+    ' ms'
+  );
+
   transactions.reverse();
+
   var venues = readVenues_(sheets.venues);
-  return {status:'success', serverTime:new Date().toISOString(), flavors:flavors, transactions:transactions, venues:venues};
+
+  Logger.log(
+    'After venues: ' +
+    (Date.now() - startTime) +
+    ' ms'
+  );
+
+  Logger.log(
+    'TOTAL: ' +
+    (Date.now() - startTime) +
+    ' ms'
+  );
+
+  return {
+    status:'success',
+    serverTime:new Date().toISOString(),
+    flavors:flavors,
+    transactions:transactions,
+    venues:venues
+  };
 }
 
 function readVenues_(sheet) {
   if (sheet.getLastRow() <= 1) return [];
-  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getDisplayValues();
+  var values = sheet.getRange(2,1,sheet.getLastRow()-1,1).getDisplayValues();
   var venues = [];
   values.forEach(function(row) {
     var venue = String(row[0] || '').trim();
-    if (venue && !venues.some(function(item){ return item.toLowerCase() === venue.toLowerCase(); })) {
-      venues.push(venue);
-    }
+    if (venue && !venues.some(function(item){ return item.toLowerCase() === venue.toLowerCase(); })) venues.push(venue);
   });
-  return venues.sort(function(a, b){ return a.localeCompare(b); });
+return venues.sort(function(a,b){ return a.localeCompare(b); });
 }
 
 function addVenue_(sheet, value) {
@@ -181,25 +240,20 @@ function removeVenue_(sheet, value) {
   var venue = String(value || '').trim();
   if (!venue) throw new Error('Venue name is required.');
   if (sheet.getLastRow() <= 1) return venue;
-  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getDisplayValues();
+  var values = sheet.getRange(2,1,sheet.getLastRow()-1,1).getDisplayValues();
   for (var i = values.length - 1; i >= 0; i--) {
-    if (String(values[i][0] || '').trim().toLowerCase() === venue.toLowerCase()) {
-      sheet.deleteRow(i + 2);
-    }
+    if (String(values[i][0] || '').trim().toLowerCase() === venue.toLowerCase()) sheet.deleteRow(i + 2);
   }
   SpreadsheetApp.flush();
   return venue;
 }
 
 function writeMenu_(sheet, flavors) {
-  var rows = flavors.map(function(f, idx) {
+  var rows = flavors.map(function(f) {
     return [
-      String(f.id || ('flv_' + Utilities.getUuid())),
-      String(f.name || '').trim(),
-      number_(f.price),
+      String(f.id || ('flv_' + Utilities.getUuid())), String(f.name || '').trim(), number_(f.price),
       Math.max(0, Math.floor(number_(f.currentStock != null ? f.currentStock : f.startingStock))),
-      String(f.photo || ''),
-      new Date()
+      String(f.photo || ''), new Date()
     ];
   }).filter(function(r){ return r[1]; });
   if (sheet.getLastRow() > 1) sheet.getRange(2,1,sheet.getLastRow()-1,6).clearContent();
@@ -209,11 +263,11 @@ function writeMenu_(sheet, flavors) {
 function appendTransactions_(menuSheet, salesSheet, txs, defaultVenue, defaultDate) {
   var existing = {};
   if (salesSheet.getLastRow() > 1) {
-    salesSheet.getRange(2,9,salesSheet.getLastRow()-1,1).getDisplayValues().forEach(function(r){ if(r[0]) existing[r[0]] = true; });
+    salesSheet.getRange(2,9,salesSheet.getLastRow()-1,1).getDisplayValues().forEach(function(r){ if (r[0]) existing[r[0]] = true; });
   }
   var menuRows = menuSheet.getLastRow() > 1 ? menuSheet.getRange(2,1,menuSheet.getLastRow()-1,6).getValues() : [];
   var byId = {}, byName = {};
-  menuRows.forEach(function(r, i){ byId[String(r[0])] = i; byName[String(r[1]).toLowerCase().trim()] = i; });
+  menuRows.forEach(function(r,i){ byId[String(r[0])] = i; byName[String(r[1]).toLowerCase().trim()] = i; });
   var outputRows = [], written = 0, duplicates = 0;
 
   txs.forEach(function(tx) {
@@ -234,23 +288,34 @@ function appendTransactions_(menuSheet, salesSheet, txs, defaultVenue, defaultDa
       menuRows[menuIdx][3] = remaining - qty;
       menuRows[menuIdx][5] = new Date();
     });
+    var netTotal = tx.totalPrice != null ? number_(tx.totalPrice) : total;
+    var paidUnits = tx.totalUnitsSold != null ? number_(tx.totalUnitsSold) : sold;
+    var freeUnits = tx.totalUnitsGiven != null ? number_(tx.totalUnitsGiven) : gifted;
+    var paymentMethod = normalizePaymentMethod_(tx.paymentMethod, netTotal, paidUnits, freeUnits);
     var summary = items.map(function(it){
       return Math.floor(number_(it.qty)) + 'x ' + String(it.name || '') + (it.isComp ? ' [FREE]' : ' [$' + number_(it.price).toFixed(2) + ']');
     }).join(', ');
     outputRows.push([
       new Date(), String(tx.venue || defaultVenue || 'Daily Pop-Up'), String(tx.date || defaultDate || ''),
-      tx.totalPrice != null ? number_(tx.totalPrice) : total,
-      tx.totalUnitsSold != null ? number_(tx.totalUnitsSold) : sold,
-      tx.totalUnitsGiven != null ? number_(tx.totalUnitsGiven) : gifted,
-      summary, JSON.stringify(items), txId
+      netTotal, paidUnits, freeUnits, summary, JSON.stringify(items), txId, paymentMethod
     ]);
-    existing[txId] = true; written++;
+    existing[txId] = true;
+    written++;
   });
 
   if (menuRows.length) menuSheet.getRange(2,1,menuRows.length,6).setValues(menuRows);
-  if (outputRows.length) salesSheet.getRange(salesSheet.getLastRow()+1,1,outputRows.length,9).setValues(outputRows);
+  if (outputRows.length) salesSheet.getRange(salesSheet.getLastRow()+1,1,outputRows.length,10).setValues(outputRows);
   SpreadsheetApp.flush();
   return {written:written, duplicates:duplicates};
+}
+
+function normalizePaymentMethod_(value, total, sold, gifted) {
+  var method = String(value || '').trim().toLowerCase();
+  if (method === 'cash') return 'Cash';
+  if (method === 'card' || method === 'venmo' || method === 'credit' || method === 'debit') return 'Card';
+  if (method === 'gift' || method === 'free' || method === 'comp') return 'Free';
+  if (!method && number_(total) === 0 && number_(sold) === 0 && number_(gifted) > 0) return 'Free';
+  return method ? method.charAt(0).toUpperCase() + method.slice(1) : 'Unknown';
 }
 
 function ensureSheets_() {
@@ -258,20 +323,27 @@ function ensureSheets_() {
   var menu = ss.getSheetByName(MENU_SHEET) || ss.insertSheet(MENU_SHEET);
   var sales = ss.getSheetByName(SALES_SHEET) || ss.insertSheet(SALES_SHEET);
   var venues = ss.getSheetByName(VENUES_SHEET) || ss.insertSheet(VENUES_SHEET);
-  if (menu.getLastRow() === 0) menu.appendRow(['Product ID','Product Name','Price','Current Stock','Photo URL / Base64','Updated At']);
-  if (sales.getLastRow() === 0) sales.appendRow(['Timestamp','Venue','Business Date','Net Total','Units Sold','Units Gifted','Summary','Items JSON','Transaction ID']);
+  var menuHeaders = ['Product ID','Product Name','Price','Current Stock','Photo URL / Base64','Updated At'];
+  var salesHeaders = ['Timestamp','Venue','Business Date','Net Total','Units Sold','Units Gifted','Summary','Items JSON','Transaction ID','Payment Method'];
+  if (menu.getLastRow() === 0) menu.appendRow(menuHeaders);
+  if (sales.getLastRow() === 0) {
+    sales.appendRow(salesHeaders);
+  } else {
+    // Safe migration: keep the original nine columns in place and add Payment Method as column 10.
+    sales.getRange(1,1,1,salesHeaders.length).setValues([salesHeaders]);
+  }
   if (venues.getLastRow() === 0) venues.appendRow(['Venue','Updated At']);
   if (venues.getLastRow() === 1) {
     var seed = {};
     if (sales.getLastRow() > 1) {
-      sales.getRange(2, 2, sales.getLastRow() - 1, 1).getDisplayValues().forEach(function(row) {
+      sales.getRange(2,2,sales.getLastRow()-1,1).getDisplayValues().forEach(function(row) {
         var venue = String(row[0] || '').trim();
         if (venue) seed[venue.toLowerCase()] = venue;
       });
     }
     if (!Object.keys(seed).length) seed['daily pop-up'] = 'Daily Pop-Up';
     var seedRows = Object.keys(seed).sort().map(function(key){ return [seed[key], new Date()]; });
-    if (seedRows.length) venues.getRange(2, 1, seedRows.length, 2).setValues(seedRows);
+    if (seedRows.length) venues.getRange(2,1,seedRows.length,2).setValues(seedRows);
   }
   return {menu:menu, sales:sales, venues:venues};
 }
