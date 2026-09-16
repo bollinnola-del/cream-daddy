@@ -1891,6 +1891,13 @@
         }
 
         window.handleHelperAuthorization = function (data) {
+            clearTimeout(window.helperAuthorizationTimeout);
+            window.helperAuthorizationInFlight = false;
+            const button = document.getElementById('unlock-register');
+            if (button) {
+                button.disabled = false;
+                button.textContent = 'Unlock Register';
+            }
             if (data && data.status === 'success' && data.token && data.expiresAt) {
                 localStorage.setItem(AUTH_TOKEN_KEY, data.token);
                 localStorage.setItem(AUTH_EXPIRY_KEY, String(data.expiresAt));
@@ -1905,20 +1912,45 @@
         };
 
         window.authorizeHelper = function () {
+            if (window.helperAuthorizationInFlight) return;
             const input = document.getElementById('helper-access-code');
             const code = (input && input.value || '').trim();
             if (!code) {
                 setLocked(true, 'Enter the helper access code.');
                 return;
             }
-            document.getElementById('access-error').textContent = 'Checking access…';
+            window.helperAuthorizationInFlight = true;
+            const button = document.getElementById('unlock-register');
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Checking…';
+            }
+            document.getElementById('access-error').textContent = 'Connecting to access server…';
             const old = document.getElementById('helper-auth-script');
             if (old) old.remove();
             const script = document.createElement('script');
             script.id = 'helper-auth-script';
             script.src = STATE.scriptUrl + '?action=authorize&accessCode=' + encodeURIComponent(code)
                 + '&callback=handleHelperAuthorization&t=' + Date.now();
-            script.onerror = () => setLocked(true, 'Could not contact the server. Check connectivity and try again.');
+            script.onerror = () => {
+                clearTimeout(window.helperAuthorizationTimeout);
+                window.helperAuthorizationInFlight = false;
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = 'Unlock Register';
+                }
+                setLocked(true, 'Could not contact the server. Check connectivity and try again.');
+            };
+            window.helperAuthorizationTimeout = setTimeout(() => {
+                if (!window.helperAuthorizationInFlight) return;
+                window.helperAuthorizationInFlight = false;
+                script.remove();
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = 'Try Again';
+                }
+                setLocked(true, 'The server is taking longer than expected. Please try again.');
+            }, 12000);
             document.body.appendChild(script);
         };
 

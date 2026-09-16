@@ -40,9 +40,19 @@ function doPost(e) {
   }
 }
 
-// ---- 24-hour shared helper authorization ----
+// ---- 4-hour shared helper authorization ----
+function getHelperSecret_() {
+  var cache = CacheService.getScriptCache();
+  var secret = cache.get('cream_daddy_helper_access_code');
+  if (!secret) {
+    secret = PropertiesService.getScriptProperties().getProperty('HELPER_ACCESS_CODE');
+    if (secret) cache.put('cream_daddy_helper_access_code', secret, 300);
+  }
+  return secret;
+}
+
 function authorizeHelper_(providedCode) {
-  var secret = PropertiesService.getScriptProperties().getProperty('HELPER_ACCESS_CODE');
+  var secret = getHelperSecret_();
   if (!secret) throw new Error('HELPER_ACCESS_CODE is not configured.');
   if (!providedCode || String(providedCode) !== String(secret)) throw new Error('Incorrect access code.');
   var expiresAt = Date.now() + (24 * 60 * 60 * 1000);
@@ -50,14 +60,14 @@ function authorizeHelper_(providedCode) {
 }
 
 function createAccessToken_(expiresAt) {
-  var secret = PropertiesService.getScriptProperties().getProperty('HELPER_ACCESS_CODE');
+  var secret = getHelperSecret_();
   var payload = String(expiresAt);
   var signature = Utilities.computeHmacSha256Signature(payload, secret);
   return payload + '.' + Utilities.base64EncodeWebSafe(signature).replace(/=+$/g, '');
 }
 
 function verifyAccessToken_(token) {
-  var secret = PropertiesService.getScriptProperties().getProperty('HELPER_ACCESS_CODE');
+  var secret = getHelperSecret_();
   if (!secret) throw new Error('HELPER_ACCESS_CODE is not configured.');
   var parts = String(token || '').split('.');
   if (parts.length !== 2) throw new Error('Authorization required.');
