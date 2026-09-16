@@ -7,10 +7,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#111111">
+    <meta name="theme-color" content="#fabc15">
     <title>Cream Daddy Sales</title>
     <link rel="manifest"
-        href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Cream%20Daddy%20Sales%22%2C%22short_name%22%3A%22CreamDaddy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23111111%22%2C%22theme_color%22%3A%22%23111111%22%7D">
+        href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22Cream%20Daddy%20Sales%22%2C%22short_name%22%3A%22CreamDaddy%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23fabc15%22%2C%22theme_color%22%3A%22%23fabc15%22%7D">
     <style>
         :root {
             --brand-pink: #e83393;
@@ -705,7 +705,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            background: var(--brand-black);
+            background: var(--brand-gold);
         }
 
         #access-lock.active {
@@ -1493,7 +1493,7 @@
 
         <div id="register-flavors-grid" class="grid-flavors"></div>
 
-        <button class="btn-primary" style="
+                <button hidden class="btn-primary venue-dependent-add-flavor" style="
                 width:100%;
                 margin-top:12px;
             " onclick="openModal('flavor-modal')">
@@ -1784,7 +1784,8 @@
                     style="font-size: 12px; font-weight: 800; margin-top: 8px; color: var(--brand-pink);"></span>
             </div>
             <div style="display: flex; gap: 8px;">
-                <button class="btn-gold" style="width: 100%;" onclick="copyJoinLink()">📋 Copy Join Link</button>
+                <button class="btn-primary" style="flex: 1; background: var(--brand-pink);" onclick="logoutHelper()">👋 Logout</button>
+                <button class="btn-gold" style="flex: 1;" onclick="shareJoinLink()">↗️ Share Join Link</button>
             </div>
         </div>
     </div>
@@ -1834,6 +1835,20 @@
 
         const AUTH_TOKEN_KEY = 'cream_daddy_auth_token';
         const AUTH_EXPIRY_KEY = 'cream_daddy_auth_expiry';
+        const VENUE_SESSION_KEY = 'cream_daddy_active_venue_session_v1';
+
+        function clearVenueSelection() {
+            sessionStorage.removeItem(VENUE_SESSION_KEY);
+            try {
+                const saved = localStorage.getItem('cream_daddy_pos_data');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    delete parsed.venue;
+                    localStorage.setItem('cream_daddy_pos_data', JSON.stringify(parsed));
+                }
+            } catch (e) { }
+            if (typeof STATE !== 'undefined') STATE.venue = '';
+        }
 
         function getAccessToken() {
             const token = localStorage.getItem(AUTH_TOKEN_KEY) || '';
@@ -1841,6 +1856,7 @@
             if (!token || Date.now() >= expiry) {
                 localStorage.removeItem(AUTH_TOKEN_KEY);
                 localStorage.removeItem(AUTH_EXPIRY_KEY);
+                clearVenueSelection();
                 return '';
             }
             return token;
@@ -1857,6 +1873,7 @@
         function clearAuthorization(message = 'Please enter the helper access code.') {
             localStorage.removeItem(AUTH_TOKEN_KEY);
             localStorage.removeItem(AUTH_EXPIRY_KEY);
+            clearVenueSelection();
             setLocked(true, message);
         }
 
@@ -2072,7 +2089,7 @@
                 }
             });
 
-            return unique.sort((a, b) => a.localeCompare(b));
+            return unique.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
         }
 
         function populateVenueSelect() {
@@ -2616,6 +2633,14 @@ Historical Sales Log records will remain unchanged.`
         function renderShiftBar() {
             document.getElementById('display-venue').textContent = `📍 ${STATE.venue}`;
             document.getElementById('display-date').textContent = STATE.date;
+            updateVenueDependentControls();
+        }
+
+        function updateVenueDependentControls() {
+            const hasVenue = Boolean(String(STATE.venue || '').trim());
+            document.querySelectorAll('.venue-dependent-add-flavor').forEach(button => {
+                button.hidden = !hasVenue;
+            });
         }
 
         function renderRegister() {
@@ -2630,7 +2655,7 @@ Historical Sales Log records will remain unchanged.`
                         <div class="empty-state-icon">🍦</div>
                         <div style="font-weight:700; margin-bottom:6px;">Your menu is empty</div>
                         <p style="font-size:12px; margin-bottom:12px;">Tap below to add your first flavor with a photo and starting cooler stock.</p>
-                        <button class="btn-primary" onclick="openModal('flavor-modal')">+ Add Flavor</button>
+                        <button class="btn-primary venue-dependent-add-flavor" onclick="openModal('flavor-modal')">+ Add Flavor</button>
                     </div>
                 `;
             } else {
@@ -2702,6 +2727,7 @@ Historical Sales Log records will remain unchanged.`
             cartCompUnits.style.color = 'var(--success)';
             document.getElementById('cart-total-price').textContent = `$${totalDollars.toFixed(2)}`;
             showNormalCheckoutButtons();
+            updateVenueDependentControls();
         }
 
         function renderInventoryTable() {
@@ -3311,6 +3337,51 @@ Historical Sales Log records will remain unchanged.`
             });
         };
 
+        window.shareJoinLink = async function () {
+            const lightweightFlavors = STATE.flavors.map(f => ({
+                id: f.id,
+                name: f.name,
+                price: f.price,
+                startingStock: f.startingStock
+            }));
+            const payloadData = {
+                room: STATE.syncRoom,
+                venue: STATE.venue,
+                date: STATE.date,
+                flavors: lightweightFlavors,
+                savedVenues: STATE.savedVenues
+            };
+            const encoded = encodeURIComponent(JSON.stringify(payloadData));
+            const currentBase = window.location.href.split('?')[0].split('#')[0];
+            const syncUrl = currentBase + '?shift=' + encoded;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Cream Daddy Shift',
+                        text: 'Join this Cream Daddy shift',
+                        url: syncUrl
+                    });
+                    return;
+                } catch (error) {
+                    if (error && error.name === 'AbortError') return;
+                }
+            }
+
+            navigator.clipboard.writeText(syncUrl).then(() => {
+                alert('📋 Join link copied to clipboard!');
+            }).catch(() => {
+                alert('Shift link:\n\n' + syncUrl);
+            });
+        };
+
+        window.logoutHelper = function () {
+            sessionStorage.removeItem('cream_daddy_venmo_pending');
+            sessionStorage.removeItem('cream_daddy_card_payment_pending_v1');
+            closeModal('sync-modal');
+            clearAuthorization('You have been logged out.');
+        };
+
         function checkForIncomingSyncPayload() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -3572,7 +3643,6 @@ Historical Sales Log records will remain unchanged.`
 
 // Venue Session + Persistent Card Checkout V1
 (function(){
- const VENUE_SESSION_KEY='cream_daddy_active_venue_session_v1';
  const PAYMENT_PENDING_KEY='cream_daddy_card_payment_pending_v1';
  function cleanVenue(v){v=String(v||'').trim();return v.toLowerCase()==='daily pop-up'?'':v}
  function sessionVenue(){return cleanVenue(sessionStorage.getItem(VENUE_SESSION_KEY))}
