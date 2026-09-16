@@ -613,9 +613,13 @@
         }
 
         .modal-title {
-            font-size: 18px;
-            font-weight: 900;
-            color: var(--brand-black);
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--brand-pink);
+            font-family: "barricada-pro", serif;
+            font-synthesis: none;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
             margin-bottom: 14px;
         }
 
@@ -1666,7 +1670,7 @@
     <div id="flavor-modal" class="modal-overlay">
         <div class="modal-box">
             <button class="btn-modal-close" onclick="closeModal('flavor-modal')">&times;</button>
-            <div class="modal-title">Add Flavor / Product</div>
+            <div class="modal-title">➕ Add Flavor / Product</div>
             <div class="photo-picker-box">
                 <div class="form-label">📸 Take Photo or Upload Image</div>
                 <div class="photo-btn-group">
@@ -1702,7 +1706,7 @@
     <div id="edit-flavor-modal" class="modal-overlay">
         <div class="modal-box">
             <button class="btn-modal-close" onclick="closeModal('edit-flavor-modal')">&times;</button>
-            <div class="modal-title">Edit Flavor</div>
+            <div class="modal-title">✏️ Edit Flavor</div>
             <input type="hidden" id="edit-flavor-id">
             <div class="photo-picker-box">
                 <div class="form-label">📸 Update Flavor Photo</div>
@@ -2529,7 +2533,7 @@ Historical Sales Log records will remain unchanged.`
                             (sum, item) =>
                                 sum +
                                 ((Number(item.price) || 0) *
-                                    (Number(item.quantity) || 1)),
+                                    (Number(item.qty) || 1)),
                             0
                         )
                     ).toFixed(2);

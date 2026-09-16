@@ -55,7 +55,7 @@ function authorizeHelper_(providedCode) {
   var secret = getHelperSecret_();
   if (!secret) throw new Error('HELPER_ACCESS_CODE is not configured.');
   if (!providedCode || String(providedCode) !== String(secret)) throw new Error('Incorrect access code.');
-  var expiresAt = Date.now() + (24 * 60 * 60 * 1000);
+  var expiresAt = Date.now() + (4 * 60 * 60 * 1000);
   return {status:'success', token:createAccessToken_(expiresAt), expiresAt:expiresAt};
 }
 
